@@ -64,7 +64,7 @@ export function Header() {
       <header className="border-b">
         <div className="container mx-auto flex items-center justify-between p-4">
           <Link href="/" className="text-xl font-bold">
-            Logo
+            Firebase Boilerplate
           </Link>
           <Loader2 className="size-4 animate-spin" />
         </div>
@@ -76,7 +76,7 @@ export function Header() {
     <header className="border-b">
       <div className="container mx-auto flex items-center justify-between p-4">
         <Link href="/" className="text-xl font-bold">
-          Logo
+          Firebase Boilerplate
         </Link>
 
         <nav className="flex items-center gap-4">
