@@ -1,0 +1,106 @@
+---
+description: Follow these rules when working on the backend.
+globs: 
+---
+### Backend Rules
+# Backend Rules
+
+Follow these rules when working on the backend.
+
+It uses Firebase Firestore and Firebase Storage.
+
+## General Rules
+
+- Use Firebase Admin SDK for server-side operations
+- Use Firebase Client SDK for client-side operations
+- Always handle errors gracefully
+
+## Organization
+
+## Database (Firestore)
+
+- Collections are defined in `db/db.ts`
+- Use the `collections` object to reference collection names
+- Always include proper error handling
+- Use transactions for operations that need to be atomic
+
+Example of Firestore operations:
+
+```ts
+// Creating a document
+const docRef = await db.collection(collections.profiles).add(data)
+
+// Getting a document
+const doc = await db.collection(collections.profiles).doc(id).get()
+
+// Querying documents
+const snapshot = await db
+  .collection(collections.profiles)
+  .where('userId', '==', userId)
+  .get()
+
+// Updating a document
+await db.collection(collections.profiles).doc(id).update(data)
+
+// Deleting a document
+await db.collection(collections.profiles).doc(id).delete()
+```
+
+## Server Actions
+
+- When importing actions, use `@/actions` or `@/actions/db` if db related
+- DB related actions should go in the `actions/db` folder
+- Storage related actions should go in the `actions/storage` folder
+- Other actions should go in the `actions` folder
+- Name files like `example-actions.ts`
+- All actions should go in the `actions` folder
+- Only write the needed actions
+- Return an ActionState with the needed data type from actions
+- Include Action at the end of function names `Ex: exampleFunction -> exampleFunctionAction`
+- Actions should return a Promise<ActionState<T>>
+- Sort in CRUD order: Create, Read, Update, Delete
+- Make sure to return undefined as the data type if the action is not supposed to return any data
+
+```ts
+export type ActionState<T> =
+  | { isSuccess: true; message: string; data: T }
+  | { isSuccess: false; message: string; data?: never }
+```
+
+Example of an action:
+
+`actions/db/profiles-actions.ts`
+
+```ts
+"use server"
+
+import { db, collections } from "@/db/db"
+import { FirebaseProfile } from "@/types/firebase-types"
+import { ActionState } from "@/types"
+import { FieldValue } from 'firebase-admin/firestore'
+
+export async function createProfileAction(
+  data: Omit<FirebaseProfile, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<ActionState<FirebaseProfile>> {
+  try {
+    const profileData = {
+      ...data,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp()
+    }
+    
+    const docRef = await db.collection(collections.profiles).add(profileData)
+    const newProfile = await docRef.get()
+    const profileWithId = { id: docRef.id, ...newProfile.data() } as FirebaseProfile
+    
+    return {
+      isSuccess: true,
+      message: "Profile created successfully",
+      data: profileWithId
+    }
+  } catch (error) {
+    console.error("Error creating profile:", error)
+    return { isSuccess: false, message: "Failed to create profile" }
+  }
+}
+```

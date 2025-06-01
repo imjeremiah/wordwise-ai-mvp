@@ -1,0 +1,503 @@
+# Project Instructions
+
+Use specification and guidelines as you build the app.
+
+Write the complete code for every step. Do not get lazy.
+
+Your goal is to completely finish whatever I ask for.
+
+You will see <ai_context> tags in the code. These are context tags that you should use to help you understand the codebase.
+
+## Overview
+
+This is a web app template.
+
+## Tech Stack
+
+- Frontend: Next.js, Tailwind, Shadcn, Framer Motion
+- Backend: Firebase (Firestore, Storage, Auth)
+- Auth: Firebase Authentication
+- Payments: Stripe
+- Analytics: PostHog
+- Deployment: Vercel
+
+## Project Structure
+
+- `actions` - Server actions
+  - `db` - Database related actions
+  - `storage` - Firebase Storage actions
+  - Other actions
+- `app` - Next.js app router
+  - `api` - API routes
+  - `route` - An example route
+    - `_components` - One-off components for the route
+    - `layout.tsx` - Layout for the route
+    - `page.tsx` - Page for the route
+- `components` - Shared components
+  - `ui` - UI components
+  - `utilities` - Utility components
+- `db` - Database
+  - `db.ts` - Firebase Firestore configuration
+- `lib` - Library code
+  - `hooks` - Custom hooks
+  - `firebase-config.ts` - Firebase Admin SDK configuration
+  - `firebase-client.ts` - Firebase Client SDK configuration
+  - `firebase-auth.ts` - Firebase Auth helpers
+- `prompts` - Prompt files
+- `public` - Static assets
+- `types` - Type definitions
+
+## Rules
+
+Follow these rules when building the app.
+
+### General Rules
+
+- Use `@` to import anything from the app unless otherwise specified
+- Use kebab case for all files and folders unless otherwise specified
+- Don't update shadcn components unless otherwise specified
+
+#### Env Rules
+
+- If you update environment variables, update the `.env.example` file
+- All environment variables should go in `.env.local`
+- Do not expose environment variables to the frontend
+- Use `NEXT_PUBLIC_` prefix for environment variables that need to be accessed from the frontend
+- You may import environment variables in server actions and components by using `process.env.VARIABLE_NAME`
+
+#### Type Rules
+
+Follow these rules when working with types.
+
+- When importing types, use `@/types`
+- Name files like `example-types.ts`
+- All types should go in `types`
+- Make sure to export the types in `types/index.ts`
+- Prefer interfaces over type aliases
+- Use Firebase types from `@/types/firebase-types`
+
+An example of a type:
+
+`types/actions-types.ts`
+
+```ts
+export type ActionState<T> =
+  | { isSuccess: true; message: string; data: T }
+  | { isSuccess: false; message: string; data?: never }
+```
+
+And exporting it:
+
+`types/index.ts`
+
+```ts
+export * from "./actions-types"
+```
+
+### Frontend Rules
+
+Follow these rules when working on the frontend.
+
+It uses Next.js, Tailwind, Shadcn, and Framer Motion.
+
+#### General Rules
+
+- Use `lucide-react` for icons
+- useSidebar must be used within a SidebarProvider
+
+#### Components
+
+- Use divs instead of other html tags unless otherwise specified
+- Separate the main parts of a component's html with an extra blank line for visual spacing
+- Always tag a component with either `use server` or `use client` at the top, including layouts and pages
+
+##### Organization
+
+- All components be named using kebab case like `example-component.tsx` unless otherwise specified
+- Put components in `/_components` in the route if one-off components
+- Put components in `/components` from the root if shared components
+
+##### Data Fetching
+
+- Fetch data in server components and pass the data down as props to client components.
+- Use server actions from `/actions` to mutate data.
+
+##### Server Components
+
+- Use `"use server"` at the top of the file.
+- Implement Suspense for asynchronous data fetching to show loading states while data is being fetched.
+- If no asynchronous logic is required for a given server component, you do not need to wrap the component in `<Suspense>`. You can simply return the final UI directly since there is no async boundary needed.
+- If asynchronous fetching is required, you can use a `<Suspense>` boundary and a fallback to indicate a loading state while data is loading.
+- Server components cannot be imported into client components. If you want to use a server component in a client component, you must pass the as props using the "children" prop
+- params in server pages should be awaited such as `const { courseId } = await params` where the type is `params: Promise<{ courseId: string }>`
+
+Example of a server layout:
+
+```tsx
+"use server"
+
+export default async function ExampleServerLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
+  return children
+}
+```
+
+Example of a server page (with async logic):
+
+```tsx
+"use server"
+
+import { Suspense } from "react"
+import { SomeAction } from "@/actions/some-actions"
+import SomeComponent from "./_components/some-component"
+import SomeSkeleton from "./_components/some-skeleton"
+
+export default async function ExampleServerPage() {
+  return (
+    <Suspense fallback={<SomeSkeleton className="some-class" />}>
+      <SomeComponentFetcher />
+    </Suspense>
+  )
+}
+
+async function SomeComponentFetcher() {
+  const { data } = await SomeAction()
+  return <SomeComponent className="some-class" initialData={data || []} />
+}
+```
+
+Example of a server page (no async logic required):
+
+```tsx
+"use server"
+
+import SomeClientComponent from "./_components/some-client-component"
+
+// In this case, no asynchronous work is being done, so no Suspense or fallback is required.
+export default async function ExampleServerPage() {
+  return <SomeClientComponent initialData={[]} />
+}
+```
+
+Example of a server component:
+
+```tsx
+"use server"
+
+interface ExampleServerComponentProps {
+  // Your props here
+}
+
+export async function ExampleServerComponent({
+  props
+}: ExampleServerComponentProps) {
+  // Your code here
+}
+```
+
+##### Client Components
+
+- Use `"use client"` at the top of the file
+- Client components can safely rely on props passed down from server components, or handle UI interactions without needing <Suspense> if there's no async logic.
+- Never use server actions in client components. If you need to create a new server action, create it in `/actions`
+
+Example of a client page:
+
+```tsx
+"use client"
+
+export default function ExampleClientPage() {
+  // Your code here
+}
+```
+
+Example of a client component:
+
+```tsx
+"use client"
+
+interface ExampleClientComponentProps {
+  initialData: any[]
+}
+
+export default function ExampleClientComponent({
+  initialData
+}: ExampleClientComponentProps) {
+  // Client-side logic here
+  return <div>{initialData.length} items</div>
+}
+```
+
+### Backend Rules
+
+Follow these rules when working on the backend.
+
+It uses Firebase Firestore and Firebase Storage.
+
+#### General Rules
+
+- Use Firebase Admin SDK for server-side operations
+- Use Firebase Client SDK for client-side operations
+- Always handle errors gracefully
+
+#### Organization
+
+#### Database (Firestore)
+
+- Collections are defined in `db/db.ts`
+- Use the `collections` object to reference collection names
+- Always include proper error handling
+- Use transactions for operations that need to be atomic
+
+Example of Firestore operations:
+
+```ts
+// Creating a document
+const docRef = await db.collection(collections.profiles).add(data)
+
+// Getting a document
+const doc = await db.collection(collections.profiles).doc(id).get()
+
+// Querying documents
+const snapshot = await db
+  .collection(collections.profiles)
+  .where('userId', '==', userId)
+  .get()
+
+// Updating a document
+await db.collection(collections.profiles).doc(id).update(data)
+
+// Deleting a document
+await db.collection(collections.profiles).doc(id).delete()
+```
+
+#### Server Actions
+
+- When importing actions, use `@/actions` or `@/actions/db` if db related
+- DB related actions should go in the `actions/db` folder
+- Storage related actions should go in the `actions/storage` folder
+- Other actions should go in the `actions` folder
+- Name files like `example-actions.ts`
+- All actions should go in the `actions` folder
+- Only write the needed actions
+- Return an ActionState with the needed data type from actions
+- Include Action at the end of function names `Ex: exampleFunction -> exampleFunctionAction`
+- Actions should return a Promise<ActionState<T>>
+- Sort in CRUD order: Create, Read, Update, Delete
+- Make sure to return undefined as the data type if the action is not supposed to return any data
+
+```ts
+export type ActionState<T> =
+  | { isSuccess: true; message: string; data: T }
+  | { isSuccess: false; message: string; data?: never }
+```
+
+Example of an action:
+
+`actions/db/profiles-actions.ts`
+
+```ts
+"use server"
+
+import { db, collections } from "@/db/db"
+import { FirebaseProfile } from "@/types/firebase-types"
+import { ActionState } from "@/types"
+import { FieldValue } from 'firebase-admin/firestore'
+
+export async function createProfileAction(
+  data: Omit<FirebaseProfile, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<ActionState<FirebaseProfile>> {
+  try {
+    const profileData = {
+      ...data,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp()
+    }
+    
+    const docRef = await db.collection(collections.profiles).add(profileData)
+    const newProfile = await docRef.get()
+    const profileWithId = { id: docRef.id, ...newProfile.data() } as FirebaseProfile
+    
+    return {
+      isSuccess: true,
+      message: "Profile created successfully",
+      data: profileWithId
+    }
+  } catch (error) {
+    console.error("Error creating profile:", error)
+    return { isSuccess: false, message: "Failed to create profile" }
+  }
+}
+```
+
+### Auth Rules
+
+Follow these rules when working on auth.
+
+It uses Firebase Authentication.
+
+#### General Rules
+
+- Import the auth helper with `import { auth } from "@/lib/firebase-auth"` in server components
+- Use `import { auth } from "@/lib/firebase-client"` in client components
+- await the auth helper in server actions
+- Use session cookies for server-side authentication
+
+### Payments Rules
+
+Follow these rules when working on payments.
+
+It uses Stripe for payments.
+
+### Analytics Rules
+
+Follow these rules when working on analytics.
+
+It uses PostHog for analytics.
+
+# Storage Rules
+
+Follow these rules when working with Firebase Storage.
+
+It uses Firebase Storage for file uploads, downloads, and management.
+
+## General Rules
+
+- Always use environment variables for bucket names to maintain consistency across environments
+- Never hardcode bucket names in the application code
+- Always handle file size limits and allowed file types at the application level
+- Always implement proper error handling for storage operations
+- Use content-type headers when uploading files to ensure proper file handling
+
+## Organization
+
+### Buckets
+
+- Name buckets in kebab-case: `user-uploads`, `profile-images`
+- Create separate buckets for different types of files (e.g., `profile-images`, `documents`, `attachments`)
+- Document bucket purposes in a central location
+- Set appropriate bucket permissions based on access requirements
+
+### File Structure
+
+- Organize files in folders based on their purpose and ownership
+- Use predictable, collision-resistant naming patterns
+- Structure: `{bucket}/{userId}/{purpose}/{filename}`
+- Example: `profile-images/123e4567-e89b/avatar/profile.jpg`
+- Include timestamps in filenames when version history is important
+- Example: `documents/123e4567-e89b/contracts/2024-02-13-contract.pdf`
+
+## Actions
+
+- When importing storage actions, use `@/actions/storage`
+- Name files like `example-storage-actions.ts`
+- Include StorageAction at the end of function names `Ex: uploadFile -> uploadFileStorageAction`
+- Follow the same ActionState pattern as DB actions
+
+Example of a storage action:
+
+```ts
+"use server"
+
+import { adminStorage } from '@/lib/firebase-config'
+import { ActionState } from '@/types'
+
+export async function uploadFileStorageAction(
+  bucket: string,
+  path: string,
+  buffer: Buffer,
+  contentType: string
+): Promise<ActionState<{ path: string; url: string }>> {
+  try {
+    const file = adminStorage.bucket(bucket).file(path)
+    
+    await file.save(buffer, {
+      metadata: {
+        contentType: contentType
+      }
+    })
+    
+    const [url] = await file.getSignedUrl({
+      action: 'read',
+      expires: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
+    })
+    
+    return {
+      isSuccess: true,
+      message: "File uploaded successfully",
+      data: { path, url }
+    }
+  } catch (error) {
+    console.error("Error uploading file:", error)
+    return { isSuccess: false, message: "Failed to upload file" }
+  }
+}
+```
+
+## File Handling
+
+### Upload Rules
+
+- Always validate file size before upload
+- Implement file type validation using both extension and MIME type
+- Generate unique filenames to prevent collisions
+- Set appropriate content-type headers
+- Handle existing files appropriately (error or overwrite)
+
+Example validation:
+
+```ts
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"]
+
+function validateFile(file: File): boolean {
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error("File size exceeds limit")
+  }
+
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    throw new Error("File type not allowed")
+  }
+
+  return true
+}
+```
+
+### Download Rules
+
+- Always handle missing files gracefully
+- Implement proper error handling for failed downloads
+- Use signed URLs for private files
+
+### Delete Rules
+
+- Implement soft deletes when appropriate
+- Clean up related database records when deleting files
+- Handle bulk deletions carefully
+- Verify ownership before deletion
+
+## Security
+
+### Access Control
+
+- Generate short-lived signed URLs for private files
+- Implement proper CORS policies
+- Use separate buckets for public and private files
+- Never expose internal file paths
+- Validate user permissions before any operation
+
+## Error Handling
+
+- Implement specific error types for common storage issues
+- Always provide meaningful error messages
+- Implement retry logic for transient failures
+- Log storage errors separately for monitoring
+
+## Optimization
+
+- Implement progressive upload for large files
+- Clean up temporary files and failed uploads
+- Use batch operations when handling multiple files
