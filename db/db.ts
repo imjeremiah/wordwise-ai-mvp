@@ -6,9 +6,17 @@ Initializes the Firebase Firestore database connection for the app.
 
 import { adminDb } from "@/lib/firebase-config"
 
-console.log("[DB] Firebase Firestore initialized")
+// Log initialization status
+if (adminDb) {
+  console.log("[DB] Firebase Firestore initialized")
+} else {
+  console.warn("[DB] Firebase Firestore not available - adminDb is null")
+  console.warn(
+    "[DB] Database operations will not work without proper Firebase configuration"
+  )
+}
 
-// Export the Firestore instance
+// Export the Firestore instance (may be null if Firebase is not configured)
 export const db = adminDb
 
 // Collection references

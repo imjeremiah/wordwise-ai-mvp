@@ -6,6 +6,14 @@ import { DecodedIdToken } from "firebase-admin/auth"
 export async function getCurrentUser(): Promise<DecodedIdToken | null> {
   console.log("[Firebase Auth] Getting current user from session...")
 
+  // Check if adminAuth is available
+  if (!adminAuth) {
+    console.warn(
+      "[Firebase Auth] adminAuth is not available - Firebase not configured"
+    )
+    return null
+  }
+
   try {
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get("session")?.value
@@ -38,6 +46,14 @@ export async function getCurrentUser(): Promise<DecodedIdToken | null> {
 export async function createSessionCookie(idToken: string): Promise<string> {
   console.log("[Firebase Auth] Creating session cookie...")
 
+  // Check if adminAuth is available
+  if (!adminAuth) {
+    console.error(
+      "[Firebase Auth] adminAuth is not available - Firebase not configured"
+    )
+    throw new Error("Firebase Admin Auth is not configured")
+  }
+
   try {
     // Create session cookie that expires in 5 days
     const expiresIn = 60 * 60 * 24 * 5 * 1000 // 5 days
@@ -56,6 +72,14 @@ export async function createSessionCookie(idToken: string): Promise<string> {
 // Helper to revoke session
 export async function revokeSession(userId: string): Promise<void> {
   console.log("[Firebase Auth] Revoking session for user:", userId)
+
+  // Check if adminAuth is available
+  if (!adminAuth) {
+    console.error(
+      "[Firebase Auth] adminAuth is not available - Firebase not configured"
+    )
+    throw new Error("Firebase Admin Auth is not configured")
+  }
 
   try {
     await adminAuth.revokeRefreshTokens(userId)

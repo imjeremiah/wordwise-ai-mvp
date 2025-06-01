@@ -1,10 +1,8 @@
 /*
 <ai_context>
-This server page is the marketing homepage.
+This is the marketing home page.
 </ai_context>
 */
-
-"use server"
 
 import { HeroSection } from "@/components/landing/hero"
 import { LogoCarousel } from "@/components/landing/logo-carousel"

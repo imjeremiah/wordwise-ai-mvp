@@ -1,11 +1,10 @@
 /*
 <ai_context>
-This server page provides the main dashboard view with placeholder content.
+This is the dashboard page.
 </ai_context>
 */
 
-"use server"
-
+import { auth } from "@/lib/firebase-auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default async function DashboardPage() {

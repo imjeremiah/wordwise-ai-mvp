@@ -1,10 +1,8 @@
 /*
 <ai_context>
-The server pricing page displays available subscription plans and handles user authentication.
+This is the pricing page.
 </ai_context>
 */
-
-"use server"
 
 import Link from "next/link"
 

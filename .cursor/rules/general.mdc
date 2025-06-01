@@ -1,6 +1,7 @@
 ---
 description: Follow these rules for all requests.
 globs: 
+alwaysApply: false
 ---
 # Project Instructions
 
@@ -19,8 +20,8 @@ This is a web app template.
 ## Tech Stack
 
 - Frontend: Next.js, Tailwind, Shadcn, Framer Motion
-- Backend: Postgres, Supabase, Drizzle ORM, Server Actions
-- Auth: Clerk
+- Backend: Firebase (Firestore, Storage, Auth), Server Actions
+- Auth: Firebase Authentication
 - Payments: Stripe
 - Analytics: PostHog
 - Deployment: Vercel
@@ -93,4 +94,13 @@ And exporting it:
 ```ts
 export * from "./actions-types"
 ```
+
+## Code Philosophy
+
+### General Principles
+
+- Write clean, readable code with proper error handling
+- Follow SOLID principles and maintain separation of concerns
+- Use TypeScript for type safety
+- Implement proper logging and monitoring
 

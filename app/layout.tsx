@@ -5,8 +5,6 @@ It includes the Toaster, PostHog tracking, and ThemeProvider.
 </ai_context>
 */
 
-"use server"
-
 import "./globals.css"
 
 import { Inter } from "next/font/google"

@@ -4,9 +4,7 @@ This server layout provides a shared header and basic structure for (marketing) 
 </ai_context>
 */
 
-"use server"
-
-import Header from "@/components/header"
+import { Header } from "@/components/header"
 
 export default async function MarketingLayout({
   children

@@ -1,12 +1,10 @@
 /*
 <ai_context>
-This server layout provides a sidebar and navigation for the dashboard route.
-It wraps the dashboard page and its children with the AppSidebar.
+This is the layout for the dashboard pages. It includes auth protection.
 </ai_context>
 */
 
-"use server"
-
+import { redirect } from "next/navigation"
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
 import {
   Breadcrumb,
