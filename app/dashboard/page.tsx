@@ -8,7 +8,10 @@ It uses Firebase Auth and Firestore to get user data.
 "use server"
 
 import { auth } from "@/lib/firebase-auth"
-import { getProfileByUserIdAction } from "@/actions/db/profiles-actions"
+import {
+  getProfileByUserIdAction,
+  createProfileAction
+} from "@/actions/db/profiles-actions"
 import {
   Card,
   CardContent,
@@ -47,7 +50,33 @@ async function DashboardContent() {
   }
 
   console.log("[Dashboard Page] Fetching profile for user:", userId)
-  const profileResult = await getProfileByUserIdAction(userId)
+  let profileResult = await getProfileByUserIdAction(userId)
+
+  // If profile doesn't exist, create one
+  if (!profileResult.isSuccess) {
+    console.log("[Dashboard Page] Profile not found, creating new profile")
+
+    // Get user data from auth
+    const { user } = await auth()
+
+    profileResult = await createProfileAction({
+      userId: userId,
+      email: user?.email || "",
+      displayName: user?.name || user?.email?.split("@")[0] || "User",
+      photoURL: user?.picture || "",
+      membership: "free"
+    })
+
+    if (!profileResult.isSuccess) {
+      console.error(
+        "[Dashboard Page] Failed to create profile:",
+        profileResult.message
+      )
+    } else {
+      console.log("[Dashboard Page] Profile created successfully")
+    }
+  }
+
   const profile = profileResult.isSuccess ? profileResult.data : null
 
   const stats = [

@@ -56,6 +56,12 @@ export default function LoginPage() {
         userCredential.user.uid
       )
 
+      // Check if this is a new user (unlikely for login, but check anyway)
+      const isNewUser =
+        userCredential.user.metadata.creationTime ===
+        userCredential.user.metadata.lastSignInTime
+      console.log("[Login Page] Is new user:", isNewUser)
+
       // Get the ID token
       const idToken = await userCredential.user.getIdToken()
       console.log("[Login Page] Got ID token, creating session...")
@@ -66,7 +72,7 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ idToken })
+        body: JSON.stringify({ idToken, isNewUser })
       })
 
       if (response.ok) {
@@ -96,6 +102,12 @@ export default function LoginPage() {
         userCredential.user.uid
       )
 
+      // Check if this is a new user
+      const isNewUser =
+        userCredential.user.metadata.creationTime ===
+        userCredential.user.metadata.lastSignInTime
+      console.log("[Login Page] Is new user:", isNewUser)
+
       // Get the ID token
       const idToken = await userCredential.user.getIdToken()
       console.log("[Login Page] Got ID token, creating session...")
@@ -106,7 +118,7 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ idToken })
+        body: JSON.stringify({ idToken, isNewUser })
       })
 
       if (response.ok) {

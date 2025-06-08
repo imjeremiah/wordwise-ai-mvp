@@ -16,6 +16,7 @@
     "analyze": "ANALYZE=true npm run build",
     "firebase:setup": "node scripts/setup-firebase.js",
     "firebase:verify-auth": "node scripts/verify-firebase-auth.js",
+    "firestore:setup": "node scripts/setup-firestore.js",
     "prepare": "husky install"
   },
   "dependencies": {

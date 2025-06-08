@@ -36,6 +36,12 @@ export const HeroSection = () => {
       const result = await signInWithPopup(auth, provider)
       console.log("[HeroSection] Google auth successful:", result.user.uid)
 
+      // Check if this is a new user
+      const isNewUser =
+        result.user.metadata.creationTime ===
+        result.user.metadata.lastSignInTime
+      console.log("[HeroSection] Is new user:", isNewUser)
+
       // Get the ID token
       const idToken = await result.user.getIdToken()
 
@@ -45,7 +51,7 @@ export const HeroSection = () => {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ idToken })
+        body: JSON.stringify({ idToken, isNewUser })
       })
 
       if (!response.ok) {
