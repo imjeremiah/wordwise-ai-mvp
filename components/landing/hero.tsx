@@ -42,9 +42,12 @@ export const HeroSection = () => {
         result.user.metadata.lastSignInTime
       console.log("[HeroSection] Is new user:", isNewUser)
 
-      // Get the ID token
-      const idToken = await result.user.getIdToken()
+      // Get the ID token with force refresh to ensure it's valid
+      const idToken = await result.user.getIdToken(true)
       console.log("[HeroSection] ID token obtained, length:", idToken?.length)
+
+      // Small delay to ensure token is propagated
+      await new Promise(resolve => setTimeout(resolve, 100))
 
       // Create session cookie
       const response = await fetch("/api/auth/session", {
@@ -56,13 +59,12 @@ export const HeroSection = () => {
       })
 
       console.log("[HeroSection] Session API response status:", response.status)
+
       if (!response.ok) {
         const errorData = await response.json()
         console.error("[HeroSection] Session API error:", errorData)
-      }
-
-      if (!response.ok) {
-        throw new Error("Failed to create session")
+        const errorMessage = errorData?.error || "Failed to create session"
+        throw new Error(errorMessage)
       }
 
       console.log("[HeroSection] Session created successfully")
