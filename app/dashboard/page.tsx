@@ -43,7 +43,6 @@ import {
 } from "lucide-react"
 import { Suspense } from "react"
 import FirestoreSetupNotice from "@/components/utilities/firestore-setup-notice"
-import { motion } from "framer-motion"
 
 async function DashboardContent() {
   console.log("[Dashboard Page] Checking authentication")
@@ -189,33 +188,24 @@ async function DashboardContent() {
   ]
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Section with gradient */}
-      <Card className="relative overflow-hidden rounded-3xl border-2 border-purple-600 bg-white p-10 shadow-lg">
-        {/* Background pattern */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(147, 51, 234, 0.05) 35px, rgba(147, 51, 234, 0.05) 70px)"
-          }}
-        />
+    <div className="container mx-auto space-y-8 p-6 lg:p-8">
+      {/* Welcome Section - Modern and sleek */}
+      <Card className="relative overflow-hidden rounded-2xl border-0 bg-white p-8 shadow-sm">
         <div className="relative">
-          <h1 className="font-instrument mb-2 text-5xl font-bold tracking-tight text-black">
+          <h1 className="mb-2 text-3xl font-semibold text-gray-900">
             Welcome back, {profile?.displayName || "User"}!
           </h1>
-          <p className="mb-8 text-xl text-gray-600">
+          <p className="mb-6 text-gray-600">
             Your dashboard is ready with all the tools you need.
           </p>
           <Button
-            size="lg"
-            className="bg-purple-600 text-white shadow-lg hover:bg-purple-700 hover:shadow-xl"
+            size="default"
+            className="bg-gray-900 text-white hover:bg-gray-800"
           >
             Get Started
-            <ArrowRight className="ml-2 size-5" />
+            <ArrowRight className="ml-2 size-4" />
           </Button>
         </div>
-        {/* Decorative elements - removed purple orbs */}
       </Card>
 
       {/* Stats Grid - Following the metric card pattern from the guide */}
@@ -425,11 +415,8 @@ async function DashboardContent() {
           </CardHeader>
           <CardContent className="relative space-y-4">
             {recentActivities.map((activity, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
                 className="flex items-start gap-4 rounded-lg p-4 transition-colors hover:bg-gray-50"
               >
                 <div className="mt-0.5">
@@ -444,7 +431,7 @@ async function DashboardContent() {
                   </p>
                   <p className="mt-1 text-xs text-gray-400">{activity.time}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </CardContent>
           <CardFooter>
@@ -461,15 +448,17 @@ async function DashboardContent() {
 
 export default async function DashboardPage() {
   return (
-    <Suspense fallback={<DashboardSkeleton />}>
-      <DashboardContent />
-    </Suspense>
+    <div className="min-h-screen bg-gray-50/50">
+      <Suspense fallback={<DashboardSkeleton />}>
+        <DashboardContent />
+      </Suspense>
+    </div>
   )
 }
 
 function DashboardSkeleton() {
   return (
-    <div className="animate-pulse space-y-8">
+    <div className="container mx-auto animate-pulse space-y-8 p-6 lg:p-8">
       <div className="h-48 rounded-3xl bg-gray-100" />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (

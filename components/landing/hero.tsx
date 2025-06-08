@@ -106,7 +106,7 @@ export const HeroSection = () => {
           />
         </div>
 
-        <div className="container relative z-10 py-20 md:pb-32 md:pt-28">
+        <div className="container relative z-10 py-20 md:pb-40 md:pt-28 lg:pb-48">
           <div className="mx-auto max-w-5xl text-center">
             {/* Trust badge */}
             <motion.div
