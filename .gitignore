@@ -51,3 +51,4 @@ functions/.env
 # firebase service account (contains sensitive credentials)
 *firebase-adminsdk*.json
 ai-video-430de-firebase-adminsdk-fbsvc-858ede978e.json
+aivideoeduedu-firebase-adminsdk.json
