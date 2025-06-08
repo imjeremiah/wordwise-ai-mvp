@@ -16,6 +16,11 @@ export async function createProfileAction(
 ): Promise<ActionState<FirebaseProfile>> {
   console.log('[Profiles Action] Creating profile for user:', data.userId)
   
+  if (!db) {
+    console.error('[Profiles Action] Database not initialized')
+    return { isSuccess: false, message: "Database not initialized" }
+  }
+  
   try {
     const profileData = {
       ...data,
@@ -46,6 +51,11 @@ export async function getProfileByUserIdAction(
 ): Promise<ActionState<FirebaseProfile>> {
   console.log('[Profiles Action] Getting profile for user:', userId)
   
+  if (!db) {
+    console.error('[Profiles Action] Database not initialized')
+    return { isSuccess: false, message: "Database not initialized" }
+  }
+  
   try {
     const querySnapshot = await db
       .collection(collections.profiles)
@@ -67,8 +77,13 @@ export async function getProfileByUserIdAction(
       message: "Profile retrieved successfully",
       data: profile
     }
-  } catch (error) {
-    console.error("[Profiles Action] Error getting profile by user id", error)
+  } catch (error: any) {
+    console.error("[Profiles Action] Error getting profile by user id:", error?.message || error)
+    // If it's a NOT_FOUND error, it might be because the collection doesn't exist yet
+    if (error?.code === 5 || error?.message?.includes('NOT_FOUND')) {
+      console.log('[Profiles Action] Collection might not exist yet. It will be created when first profile is added.')
+      return { isSuccess: false, message: "Profile not found - collection may not exist yet" }
+    }
     return { isSuccess: false, message: "Failed to get profile" }
   }
 }
@@ -78,6 +93,11 @@ export async function updateProfileAction(
   data: Partial<Omit<FirebaseProfile, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<ActionState<FirebaseProfile>> {
   console.log('[Profiles Action] Updating profile for user:', userId)
+  
+  if (!db) {
+    console.error('[Profiles Action] Database not initialized')
+    return { isSuccess: false, message: "Database not initialized" }
+  }
   
   try {
     // First find the profile
@@ -121,6 +141,11 @@ export async function updateProfileByStripeCustomerIdAction(
   data: Partial<Omit<FirebaseProfile, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<ActionState<FirebaseProfile>> {
   console.log('[Profiles Action] Updating profile by Stripe customer ID:', stripeCustomerId)
+  
+  if (!db) {
+    console.error('[Profiles Action] Database not initialized')
+    return { isSuccess: false, message: "Database not initialized" }
+  }
   
   try {
     const querySnapshot = await db
