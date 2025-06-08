@@ -60,6 +60,7 @@ firebase-boilerplate/
 ├── docs/                    # Documentation
 │   ├── README.md           # Original readme
 │   ├── file_structure.md   # This file
+│   ├── frontend.md         # Frontend design system guide
 │   └── *.md               # Other documentation
 │
 ├── hooks/                   # Custom React hooks
