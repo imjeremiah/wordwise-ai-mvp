@@ -40,8 +40,18 @@ export async function createProfileAction(
       message: "Profile created successfully",
       data: profileWithId
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("[Profiles Action] Error creating profile:", error)
+    
+    // Check if it's a Firestore not enabled error
+    if (error?.code === 5 || error?.message?.includes('NOT_FOUND')) {
+      console.error('[Profiles Action] Firestore is not enabled in Firebase project')
+      return { 
+        isSuccess: false, 
+        message: "Firestore is not enabled. Please enable Firestore in your Firebase Console at https://console.firebase.google.com" 
+      }
+    }
+    
     return { isSuccess: false, message: "Failed to create profile" }
   }
 }
@@ -193,6 +203,11 @@ export async function deleteProfileAction(
   userId: string
 ): Promise<ActionState<void>> {
   console.log('[Profiles Action] Deleting profile for user:', userId)
+  
+  if (!db) {
+    console.error('[Profiles Action] Database not initialized')
+    return { isSuccess: false, message: "Database not initialized" }
+  }
   
   try {
     const querySnapshot = await db

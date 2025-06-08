@@ -39,6 +39,7 @@ import {
   ShoppingCart
 } from "lucide-react"
 import { Suspense } from "react"
+import { FirestoreSetupNotice } from "@/components/utilities/firestore-setup-notice"
 
 async function DashboardContent() {
   console.log("[Dashboard Page] Checking authentication")
@@ -52,18 +53,35 @@ async function DashboardContent() {
   console.log("[Dashboard Page] Fetching profile for user:", userId)
   let profileResult = await getProfileByUserIdAction(userId)
 
+  // Check if Firestore is not enabled
+  if (
+    !profileResult.isSuccess &&
+    profileResult.message.includes("collection may not exist yet")
+  ) {
+    console.log(
+      "[Dashboard Page] Firestore might not be enabled, attempting to create profile"
+    )
+  }
+
   // If profile doesn't exist, create one
   if (!profileResult.isSuccess) {
     console.log("[Dashboard Page] Profile not found, creating new profile")
 
     // Get user data from auth
-    const { user } = await auth()
+    const authResult = await auth()
+    const user = authResult.user
+
+    // Create profile with available data
+    // Note: DecodedIdToken from session might have limited data
+    const email = user?.email || ""
+    const displayName =
+      user?.name || user?.displayName || email.split("@")[0] || "User"
 
     profileResult = await createProfileAction({
       userId: userId,
-      email: user?.email || "",
-      displayName: user?.name || user?.email?.split("@")[0] || "User",
-      photoURL: user?.picture || "",
+      email: email,
+      displayName: displayName,
+      photoURL: user?.picture || user?.photoURL || "",
       membership: "free"
     })
 
@@ -72,6 +90,12 @@ async function DashboardContent() {
         "[Dashboard Page] Failed to create profile:",
         profileResult.message
       )
+
+      // Check if it's a Firestore not enabled error
+      if (profileResult.message.includes("Firestore is not enabled")) {
+        console.log("[Dashboard Page] Showing Firestore setup notice")
+        return <FirestoreSetupNotice />
+      }
     } else {
       console.log("[Dashboard Page] Profile created successfully")
     }
