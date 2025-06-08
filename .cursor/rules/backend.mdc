@@ -1,8 +1,8 @@
 ---
 description: Follow these rules when working on the backend.
 globs: 
+alwaysApply: false
 ---
-### Backend Rules
 # Backend Rules
 
 Follow these rules when working on the backend.

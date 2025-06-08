@@ -9,11 +9,36 @@ service cloud.firestore {
       allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
     }
     
-    // Allow authenticated users to read/write their own data
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    // Allow authenticated users to read/write their own user documents
+    match /users/{document} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+      allow update: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.uid;
     }
     
-    // Add more rules for other collections as needed
+    // Allow users to read/write their own todos
+    match /todos/{document} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Allow users to read/write their own chats
+    match /chats/{document} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Allow users to read/write messages in their chats
+    match /messages/{document} {
+      allow read: if request.auth != null && exists(/databases/$(database)/documents/chats/$(resource.data.chatId)) && get(/databases/$(database)/documents/chats/$(resource.data.chatId)).data.userId == request.auth.uid;
+      allow create: if request.auth != null && exists(/databases/$(database)/documents/chats/$(request.resource.data.chatId)) && get(/databases/$(database)/documents/chats/$(request.resource.data.chatId)).data.userId == request.auth.uid;
+      allow update: if request.auth != null && exists(/databases/$(database)/documents/chats/$(resource.data.chatId)) && get(/databases/$(database)/documents/chats/$(resource.data.chatId)).data.userId == request.auth.uid;
+      allow delete: if request.auth != null && exists(/databases/$(database)/documents/chats/$(resource.data.chatId)) && get(/databases/$(database)/documents/chats/$(resource.data.chatId)).data.userId == request.auth.uid;
+    }
   }
 } 

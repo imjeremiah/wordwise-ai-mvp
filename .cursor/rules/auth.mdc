@@ -1,14 +1,17 @@
 ---
 description: Follow these rules when working on auth.
 globs: 
+alwaysApply: false
 ---
 ### Auth Rules
 
 Follow these rules when working on auth.
 
-It uses Clerk for authentication.
+It uses Firebase Authentication.
 
 #### General Rules
 
-- Import the auth helper with `import { auth } from "@clerk/nextjs/server"` in server components
-- await the auth helper in server action
+- Import the auth helper with `import { auth } from "@/lib/firebase-auth"` in server components
+- Use `import { auth } from "@/lib/firebase-client"` in client components
+- await the auth helper in server actions
+- Use session cookies for server-side authentication

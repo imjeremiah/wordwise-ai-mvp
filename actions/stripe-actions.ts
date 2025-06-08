@@ -4,15 +4,17 @@ Contains server actions related to Stripe.
 </ai_context>
 */
 
+"use server"
+
 import {
   updateProfileAction,
   updateProfileByStripeCustomerIdAction
 } from "@/actions/db/profiles-actions"
-import { SelectProfile } from "@/db/schema"
+import { FirebaseProfile } from "@/types/firebase-types"
 import { stripe } from "@/lib/stripe"
 import Stripe from "stripe"
 
-type MembershipStatus = SelectProfile["membership"]
+type MembershipStatus = FirebaseProfile["membership"]
 
 const getMembershipStatus = (
   status: Stripe.Subscription.Status,

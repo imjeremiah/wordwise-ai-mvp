@@ -1,21 +1,27 @@
 ---
 description: Follow these rules when working on file storage.
 globs: 
+alwaysApply: false
+---
+---
+description: Follow these rules when working on file storage.
+globs: 
 ---
 # Storage Rules
 
-Follow these rules when working with Supabase Storage.
+Follow these rules when working with Firebase Storage.
 
-It uses Supabase Storage for file uploads, downloads, and management.
+It uses Firebase Storage for file uploads, downloads, and management.
 
 ## General Rules
 
 - Always use environment variables for bucket names to maintain consistency across environments
 - Never hardcode bucket names in the application code
 - Always handle file size limits and allowed file types at the application level
-- Use the `upsert` method instead of `upload` when you want to replace existing files
 - Always implement proper error handling for storage operations
 - Use content-type headers when uploading files to ensure proper file handling
+- Use Firebase Admin SDK (`adminStorage`) for server-side operations
+- Use Firebase Client SDK for client-side operations when needed
 
 ## Organization
 
@@ -24,9 +30,9 @@ It uses Supabase Storage for file uploads, downloads, and management.
 - Name buckets in kebab-case: `user-uploads`, `profile-images`
 - Create separate buckets for different types of files (e.g., `profile-images`, `documents`, `attachments`)
 - Document bucket purposes in a central location
-- Set appropriate bucket policies (public/private) based on access requirements
-- Implement RLS (Row Level Security) policies for buckets that need user-specific access
-- Make sure to let me know instructions for setting up RLS policies on Supabase since you can't do this yourself, including the SQL scripts I need to run in the editor
+- Set appropriate bucket permissions based on access requirements
+- Configure Firebase Storage security rules in `storage.rules` file
+- Default bucket is set via `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` environment variable
 
 ### File Structure
 
@@ -41,42 +47,52 @@ It uses Supabase Storage for file uploads, downloads, and management.
 
 - When importing storage actions, use `@/actions/storage`
 - Name files like `example-storage-actions.ts`
-- Include Storage at the end of function names `Ex: uploadFile -> uploadFileStorage`
+- Include StorageAction at the end of function names `Ex: uploadFile -> uploadFileStorageAction`
 - Follow the same ActionState pattern as DB actions
+- Always use server actions for storage operations to keep credentials secure
 
 Example of a storage action:
 
 ```ts
 "use server"
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { ActionState } from "@/types"
+import { adminStorage } from '@/lib/firebase-config'
+import { ActionState } from '@/types'
 
-export async function uploadFileStorage(
+export async function uploadFileStorageAction(
   bucket: string,
   path: string,
-  file: File
-): Promise<ActionState<{ path: string }>> {
+  buffer: Buffer,
+  contentType: string
+): Promise<ActionState<{ path: string; url: string }>> {
+  console.log('[Storage Action] Uploading file to:', path)
+  
   try {
-    const supabase = createClientComponentClient()
+    const file = adminStorage.bucket(bucket).file(path)
     
-    const { data, error } = await supabase
-      .storage
-      .from(bucket)
-      .upload(path, file, {
-        upsert: false,
-        contentType: file.type
-      })
-
-    if (error) throw error
-
+    await file.save(buffer, {
+      metadata: {
+        contentType: contentType
+      }
+    })
+    
+    console.log('[Storage Action] File uploaded successfully')
+    
+    // Generate a signed URL for the file
+    const [url] = await file.getSignedUrl({
+      action: 'read',
+      expires: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
+    })
+    
+    console.log('[Storage Action] Generated signed URL')
+    
     return {
       isSuccess: true,
       message: "File uploaded successfully",
-      data: { path: data.path }
+      data: { path, url }
     }
   } catch (error) {
-    console.error("Error uploading file:", error)
+    console.error("[Storage Action] Error uploading file:", error)
     return { isSuccess: false, message: "Failed to upload file" }
   }
 }
@@ -90,7 +106,8 @@ export async function uploadFileStorage(
 - Implement file type validation using both extension and MIME type
 - Generate unique filenames to prevent collisions
 - Set appropriate content-type headers
-- Handle existing files appropriately (error or upsert)
+- Handle existing files appropriately (error or overwrite)
+- Convert File objects to Buffer for server-side uploads
 
 Example validation:
 
@@ -109,6 +126,12 @@ function validateFile(file: File): boolean {
   
   return true
 }
+
+// Convert File to Buffer for server-side upload
+async function fileToBuffer(file: File): Promise<Buffer> {
+  const arrayBuffer = await file.arrayBuffer()
+  return Buffer.from(arrayBuffer)
+}
 ```
 
 ### Download Rules
@@ -116,6 +139,7 @@ function validateFile(file: File): boolean {
 - Always handle missing files gracefully
 - Implement proper error handling for failed downloads
 - Use signed URLs for private files
+- Set appropriate expiration times for signed URLs
 
 ### Delete Rules
 
@@ -123,31 +147,51 @@ function validateFile(file: File): boolean {
 - Clean up related database records when deleting files
 - Handle bulk deletions carefully
 - Verify ownership before deletion
-- Always delete all versions/transforms of a file
+- Check file existence before attempting deletion
 
 ## Security
 
-### Bucket Policies
+### Storage Security Rules
 
-- Make buckets private by default
-- Only make buckets public when absolutely necessary
-- Use RLS policies to restrict access to authorized users
-- Example RLS policy:
+- Configure security rules in `storage.rules` file
+- Make files private by default
+- Only allow public access when absolutely necessary
+- Use Firebase Authentication to restrict access
+- Example storage rules:
 
-```sql
-CREATE POLICY "Users can only access their own files"
-ON storage.objects
-FOR ALL
-USING (auth.uid()::text = (storage.foldername(name))[1]);
+```javascript
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow users to read/write their own files
+    match /users/{userId}/{allPaths=**} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Public read for profile images
+    match /profile-images/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Authenticated users only for uploads
+    match /user-uploads/{userId}/{allPaths=**} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
 ```
 
 ### Access Control
 
 - Generate short-lived signed URLs for private files
-- Implement proper CORS policies
-- Use separate buckets for public and private files
+- Implement proper CORS policies in Firebase console
+- Use separate folders for public and private files
 - Never expose internal file paths
 - Validate user permissions before any operation
+- Use Firebase Admin SDK for server-side operations to bypass security rules when needed
 
 ## Error Handling
 
@@ -155,9 +199,60 @@ USING (auth.uid()::text = (storage.foldername(name))[1]);
 - Always provide meaningful error messages
 - Implement retry logic for transient failures
 - Log storage errors separately for monitoring
+- Handle network errors gracefully
+
+Example error handling:
+
+```ts
+export async function downloadFileStorageAction(
+  bucket: string,
+  path: string
+): Promise<ActionState<{ url: string }>> {
+  console.log('[Storage Action] Downloading file from:', path)
+  
+  try {
+    const file = adminStorage.bucket(bucket).file(path)
+    
+    // Check if file exists
+    const [exists] = await file.exists()
+    if (!exists) {
+      console.log('[Storage Action] File not found')
+      return { isSuccess: false, message: "File not found" }
+    }
+    
+    // Generate a signed URL for download
+    const [url] = await file.getSignedUrl({
+      action: 'read',
+      expires: Date.now() + 60 * 60 * 1000 // 1 hour
+    })
+    
+    console.log('[Storage Action] Generated download URL')
+    
+    return {
+      isSuccess: true,
+      message: "Download URL generated successfully",
+      data: { url }
+    }
+  } catch (error) {
+    console.error("[Storage Action] Error downloading file:", error)
+    return { isSuccess: false, message: "Failed to generate download URL" }
+  }
+}
+```
 
 ## Optimization
 
 - Implement progressive upload for large files
 - Clean up temporary files and failed uploads
 - Use batch operations when handling multiple files
+- Consider implementing file compression for images
+- Use appropriate image formats (WebP for modern browsers)
+- Implement caching strategies for frequently accessed files
+
+## Testing
+
+- Test file uploads with various file types and sizes
+- Verify security rules work as expected
+- Test error scenarios (network failures, permission denied)
+- Ensure signed URLs expire correctly
+- Test concurrent uploads and downloads

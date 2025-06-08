@@ -6,6 +6,7 @@ export interface FirebaseProfile {
   photoURL?: string
   membership: "free" | "pro"
   stripeCustomerId?: string
+  stripeSubscriptionId?: string
   createdAt: Date
   updatedAt: Date
 }
