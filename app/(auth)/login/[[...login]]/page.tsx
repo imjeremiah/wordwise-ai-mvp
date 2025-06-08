@@ -10,12 +10,23 @@ It uses Firebase Authentication and creates a session cookie on successful login
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider
+} from "firebase/auth"
 import { auth } from "@/lib/firebase-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Mail, Lock, AlertCircle } from "lucide-react"
 import { motion } from "framer-motion"
@@ -113,17 +124,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-purple-50/50 to-background">
+    <div className="to-background flex min-h-screen items-center justify-center bg-gradient-to-b from-purple-50/50 p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="w-full max-w-md"
       >
-        <Card className="bg-white/80 backdrop-blur-sm shadow-xl shadow-purple-500/10">
+        <Card className="bg-white/80 shadow-xl shadow-purple-500/10 backdrop-blur-sm">
           <CardHeader className="space-y-1 text-center">
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-purple-400 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/30">
+            <div className="mb-4 flex justify-center">
+              <div className="flex size-16 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-400 shadow-lg shadow-purple-500/30">
                 <span className="text-2xl font-bold text-white">FB</span>
               </div>
             </div>
@@ -132,11 +143,11 @@ export default function LoginPage() {
               Sign in to your account to continue
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent className="space-y-4">
             {error && (
               <Alert variant="destructive" className="border-red-200 bg-red-50">
-                <AlertCircle className="h-4 w-4" />
+                <AlertCircle className="size-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -147,12 +158,12 @@ export default function LoginPage() {
                   Email address
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Mail className="text-muted-foreground absolute left-3 top-3 size-4" />
                   <Input
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     className="pl-10"
                     placeholder="name@example.com"
                     required
@@ -160,18 +171,18 @@ export default function LoginPage() {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">
                   Password
                 </Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Lock className="text-muted-foreground absolute left-3 top-3 size-4" />
                   <Input
                     id="password"
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={e => setPassword(e.target.value)}
                     className="pl-10"
                     placeholder="Enter your password"
                     required
@@ -189,7 +200,7 @@ export default function LoginPage() {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 size-4 animate-spin" />
                     Signing in...
                   </>
                 ) : (
@@ -200,10 +211,10 @@ export default function LoginPage() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border/40" />
+                <span className="border-border/40 w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white/80 px-2 text-muted-foreground">
+                <span className="text-muted-foreground bg-white/80 px-2">
                   Or continue with
                 </span>
               </div>
@@ -219,12 +230,12 @@ export default function LoginPage() {
             >
               {loadingGoogle ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 size-4 animate-spin" />
                   Connecting...
                 </>
               ) : (
                 <>
-                  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                  <svg className="mr-2 size-4" viewBox="0 0 24 24">
                     <path
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                       fill="#4285F4"
@@ -247,13 +258,13 @@ export default function LoginPage() {
               )}
             </Button>
           </CardContent>
-          
+
           <CardFooter className="flex flex-col space-y-4 text-center">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-muted-foreground text-sm">
               Don't have an account?{" "}
-              <Link 
-                href="/signup" 
-                className="text-purple-600 hover:text-purple-700 font-medium hover:underline"
+              <Link
+                href="/signup"
+                className="font-medium text-purple-600 hover:text-purple-700 hover:underline"
               >
                 Create account
               </Link>

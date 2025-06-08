@@ -15,7 +15,7 @@ You will see <ai_context> tags in the code. These are context tags that you shou
 
 ## Overview
 
-This is a web app template.
+This is an app 
 
 ## Tech Stack
 
@@ -24,7 +24,7 @@ This is a web app template.
 - Auth: Firebase Authentication
 - Payments: Stripe
 - Analytics: PostHog
-- Deployment: Vercel
+- Deployment: Firebase
 
 ## Project Structure
 
@@ -95,6 +95,41 @@ And exporting it:
 export * from "./actions-types"
 ```
 
+### AI Prompt for Preventing Timestamp Serialization Errors
+
+"When you are working in this codebase, you must be extremely careful about data serialization between the server and the client.
+
+**Here is the critical rule:** Any data retrieved from Firestore in a server action or server component **MUST** have its `Timestamp` objects converted to a serializable format before being sent to a client component.
+
+Our project has a specific utility function for this purpose: `convertTimestampsInObject` located in `@/lib/utils.ts`.
+
+Before completing any task that involves fetching data from Firestore on the server, you must verify that the data returned to the client is passed through `convertTimestampsInObject`. Failure to do so will cause the application to crash.
+
+**Correct Implementation Example:**
+```typescript
+// GOOD: This prevents the error.
+const rawData = { id: doc.id, ...doc.data() };
+const serializableData = convertTimestampsInObject(rawData);
+
+return {
+  isSuccess: true,
+  data: serializableData // Pass the sanitized data to the client
+};
+```
+
+**Incorrect Implementation Example:**
+```typescript
+// BAD: This will cause a runtime error.
+const rawData = { id: doc.id, ...doc.data() };
+
+return {
+  isSuccess: true,
+  data: rawData // rawData contains non-serializable Timestamps
+};
+```
+
+Acknowledge that you understand this rule. It is a non-negotiable step for all Firestore data fetching that interacts with the client.
+
 ## Code Philosophy
 
 ### General Principles
@@ -103,4 +138,17 @@ export * from "./actions-types"
 - Follow SOLID principles and maintain separation of concerns
 - Use TypeScript for type safety
 - Implement proper logging and monitoring
+- make all buttons interactive. animations when i click them to show user they were clicked and registered
+
+### Idiot-Proof Design
+
+Build every feature with the assumption that the user will try to break it in unexpected ways. The system should be robust enough to handle malformed input, incorrect usage, and edge cases without crashing or producing strange results.
+
+- **Flexible Inputs**: Forms should accept multiple valid formats (e.g., `example.com`, `www.example.com`, `https://example.com`).
+- **Anticipate Errors**: Proactively identify what could go wrong and implement graceful error handling. A user error should never cause a system failure.
+- **Clear Guidance**: If a user does something wrong, provide a clear, concise, and helpful error message that tells them exactly how to fix it.
+- **No Dead Ends**: Ensure that users can always recover from an error state without having to refresh the page or start over.
+- **Sensible Defaults**: Provide smart defaults for all settings to minimize the cognitive load on the user.
+
+The goal is to create a seamless, frustration-free experience where the user feels guided and supported, no matter what they do.
 

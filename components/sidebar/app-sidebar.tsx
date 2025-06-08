@@ -8,7 +8,15 @@ Uses shadcn's sidebar components with purple-centric design.
 "use client"
 
 import * as React from "react"
-import { LayoutDashboard, Settings, CreditCard, LogOut, ChevronDown, User, Home } from "lucide-react"
+import {
+  LayoutDashboard,
+  Settings,
+  CreditCard,
+  LogOut,
+  ChevronDown,
+  User,
+  Home
+} from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -25,15 +33,21 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
-  SidebarTrigger,
+  SidebarTrigger
 } from "@/components/ui/sidebar"
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
+  CollapsibleTrigger
 } from "@/components/ui/collapsible"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
 import { FirebaseProfile } from "@/types/firebase-types"
 
 interface AppSidebarProps {
@@ -46,11 +60,11 @@ export function AppSidebar({ profile }: AppSidebarProps) {
 
   const handleLogout = async () => {
     console.log("[Sidebar] Logging out...")
-    
+
     try {
       // Delete session
       const response = await fetch("/api/auth/session", {
-        method: "DELETE",
+        method: "DELETE"
       })
 
       if (response.ok) {
@@ -68,7 +82,7 @@ export function AppSidebar({ profile }: AppSidebarProps) {
     {
       title: "Dashboard",
       icon: LayoutDashboard,
-      href: "/dashboard",
+      href: "/dashboard"
     },
     {
       title: "Account",
@@ -76,57 +90,65 @@ export function AppSidebar({ profile }: AppSidebarProps) {
       items: [
         {
           title: "Profile",
-          href: "/dashboard/profile",
+          href: "/dashboard/profile"
         },
         {
           title: "Settings",
           href: "/dashboard/settings",
-          icon: Settings,
+          icon: Settings
         },
         {
           title: "Billing",
           href: "/dashboard/billing",
-          icon: CreditCard,
-        },
-      ],
-    },
+          icon: CreditCard
+        }
+      ]
+    }
   ]
 
   return (
     <Sidebar className="border-r border-purple-100/20">
       <SidebarHeader className="border-b border-purple-100/20">
-        <Link href="/" className="flex items-center gap-3 px-2 py-4 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-400 shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/30 transition-shadow">
+        <Link href="/" className="group flex items-center gap-3 px-2 py-4">
+          <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-400 shadow-lg shadow-purple-500/20 transition-shadow group-hover:shadow-purple-500/30">
             <span className="text-sm font-bold text-white">FB</span>
           </div>
-          <span className="font-semibold text-lg bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-lg font-semibold text-transparent">
             Firebase Boilerplate
           </span>
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="bg-gradient-to-b from-background to-purple-50/20">
+      <SidebarContent className="from-background bg-gradient-to-b to-purple-50/20">
         <SidebarGroup>
           <SidebarMenu>
-            {menuItems.map((item) => (
+            {menuItems.map(item => (
               <React.Fragment key={item.title}>
                 {item.items ? (
-                  <Collapsible open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+                  <Collapsible
+                    open={isProfileOpen}
+                    onOpenChange={setIsProfileOpen}
+                  >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="hover:bg-purple-50 hover:text-purple-700 data-[state=open]:bg-purple-50 data-[state=open]:text-purple-700">
-                          <item.icon className="h-4 w-4" />
+                          <item.icon className="size-4" />
                           <span>{item.title}</span>
-                          <ChevronDown className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                          <ChevronDown className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {item.items.map((subItem) => (
+                          {item.items.map(subItem => (
                             <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton asChild className="hover:bg-purple-50 hover:text-purple-700">
+                              <SidebarMenuSubButton
+                                asChild
+                                className="hover:bg-purple-50 hover:text-purple-700"
+                              >
                                 <Link href={subItem.href}>
-                                  {subItem.icon && <subItem.icon className="h-4 w-4" />}
+                                  {subItem.icon && (
+                                    <subItem.icon className="size-4" />
+                                  )}
                                   <span>{subItem.title}</span>
                                 </Link>
                               </SidebarMenuSubButton>
@@ -138,9 +160,12 @@ export function AppSidebar({ profile }: AppSidebarProps) {
                   </Collapsible>
                 ) : (
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild className="hover:bg-purple-50 hover:text-purple-700">
+                    <SidebarMenuButton
+                      asChild
+                      className="hover:bg-purple-50 hover:text-purple-700"
+                    >
                       <Link href={item.href}>
-                        <item.icon className="h-4 w-4" />
+                        <item.icon className="size-4" />
                         <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -157,45 +182,58 @@ export function AppSidebar({ profile }: AppSidebarProps) {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton 
-                  size="lg" 
+                <SidebarMenuButton
+                  size="lg"
                   className="w-full justify-start hover:bg-purple-50 hover:text-purple-700 data-[state=open]:bg-purple-50 data-[state=open]:text-purple-700"
                 >
-                  <Avatar className="h-8 w-8 mr-2 border-2 border-purple-200/50">
-                    <AvatarImage src={profile?.photoURL || ""} alt={profile?.displayName} />
+                  <Avatar className="mr-2 size-8 border-2 border-purple-200/50">
+                    <AvatarImage
+                      src={profile?.photoURL || ""}
+                      alt={profile?.displayName}
+                    />
                     <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-400 text-white">
                       {profile?.displayName?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium">{profile?.displayName || "User"}</span>
-                    <span className="text-xs text-muted-foreground">{profile?.email}</span>
+                    <span className="font-medium">
+                      {profile?.displayName || "User"}
+                    </span>
+                    <span className="text-muted-foreground text-xs">
+                      {profile?.email}
+                    </span>
                   </div>
-                  <ChevronDown className="ml-auto h-4 w-4" />
+                  <ChevronDown className="ml-auto size-4" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                className="w-[--radix-dropdown-menu-trigger-width] bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-purple-100/20" 
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] border-purple-100/20 bg-white/90 backdrop-blur-md dark:bg-gray-900/90"
                 align="start"
               >
-                <DropdownMenuItem asChild className="hover:bg-purple-50 hover:text-purple-700 cursor-pointer">
+                <DropdownMenuItem
+                  asChild
+                  className="cursor-pointer hover:bg-purple-50 hover:text-purple-700"
+                >
                   <Link href="/dashboard/profile">
-                    <User className="mr-2 h-4 w-4" />
+                    <User className="mr-2 size-4" />
                     Profile
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="hover:bg-purple-50 hover:text-purple-700 cursor-pointer">
+                <DropdownMenuItem
+                  asChild
+                  className="cursor-pointer hover:bg-purple-50 hover:text-purple-700"
+                >
                   <Link href="/dashboard/settings">
-                    <Settings className="mr-2 h-4 w-4" />
+                    <Settings className="mr-2 size-4" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-purple-100/20" />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={handleLogout}
-                  className="hover:bg-red-50 hover:text-red-700 cursor-pointer"
+                  className="cursor-pointer hover:bg-red-50 hover:text-red-700"
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="mr-2 size-4" />
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
