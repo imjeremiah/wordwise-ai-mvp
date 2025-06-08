@@ -3,12 +3,18 @@
  * Run with: npm run firestore:setup
  */
 
-const { db, collections } = require("../db/db");
-
 console.log("\n🔥 Firestore Setup Guide\n");
 console.log("=========================\n");
 
 console.log("📋 Collections to be created:");
+const collections = {
+  profiles: 'profiles',
+  users: 'users',
+  todos: 'todos',
+  chats: 'chats',
+  messages: 'messages'
+};
+
 Object.entries(collections).forEach(([key, value]) => {
   console.log(`   - ${value} (${key})`);
 });
@@ -67,27 +73,8 @@ console.log("   - Check Firestore Database in console\n");
 
 console.log("✅ Once these steps are complete, your Firestore should be ready!\n");
 
-// Check if we can connect to Firestore
-async function checkConnection() {
-  try {
-    console.log("🔍 Checking Firestore connection...");
-    
-    // Try to list collections
-    const collectionsSnapshot = await db.listCollections();
-    const collectionIds = collectionsSnapshot.map(col => col.id);
-    
-    if (collectionIds.length > 0) {
-      console.log("✅ Firestore is connected! Found collections:", collectionIds);
-    } else {
-      console.log("⚠️  Firestore is connected but no collections found (this is normal for a new database)");
-    }
-  } catch (error) {
-    console.error("❌ Could not connect to Firestore:", error.message);
-    console.log("\n🔧 Please follow the setup steps above to configure Firestore");
-  }
-}
-
-// Only run the check if this script is executed directly
-if (require.main === module) {
-  checkConnection();
-} 
+console.log("🔧 Quick Check:")
+console.log("   After setting up Firestore, you can verify it's working by:");
+console.log("   1. Signing in to your app");
+console.log("   2. Checking the Firestore Database in Firebase Console");
+console.log("   3. You should see a 'profiles' collection with your user data\n"); 
