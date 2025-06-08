@@ -5,8 +5,6 @@ Shows the transformation from monthly fees to ownership.
 </ai_context>
 */
 
-"use server"
-
 import { ArrowRight } from "lucide-react"
 
 export async function DreamOutcomeSection() {

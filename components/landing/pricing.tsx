@@ -5,8 +5,6 @@ Shows pricing options with purple-centric design.
 </ai_context>
 */
 
-"use server"
-
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Check, Sparkles, ArrowRight } from "lucide-react"

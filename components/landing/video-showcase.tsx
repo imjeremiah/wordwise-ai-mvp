@@ -5,8 +5,6 @@ Shows a large project dashboard preview with purple shadow effects.
 </ai_context>
 */
 
-"use server"
-
 import Image from "next/image"
 
 export async function VideoShowcaseSection() {

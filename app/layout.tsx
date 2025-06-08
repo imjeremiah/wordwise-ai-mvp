@@ -1,11 +1,9 @@
 /*
 <ai_context>
-This is the root layout for the app.
-It includes the Toaster, PostHog tracking, ThemeProvider, and beautiful gradient background.
+This is the root layout for the application.
+It wraps all pages and provides the basic HTML structure.
 </ai_context>
 */
-
-"use server"
 
 import "./globals.css"
 

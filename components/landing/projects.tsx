@@ -5,8 +5,6 @@ Shows different types of projects the company has built.
 </ai_context>
 */
 
-"use server"
-
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
 import { Clock, DollarSign, Rocket } from "lucide-react"

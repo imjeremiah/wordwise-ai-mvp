@@ -5,8 +5,6 @@ Contains company info, links, and social media.
 </ai_context>
 */
 
-"use server"
-
 import Link from "next/link"
 import { Code2, Github, Twitter, Linkedin, Youtube } from "lucide-react"
 
