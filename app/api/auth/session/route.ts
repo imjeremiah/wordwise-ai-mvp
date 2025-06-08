@@ -11,6 +11,15 @@ export async function POST(request: NextRequest) {
     const { idToken, isNewUser } = await request.json()
     console.log("[Session API] Processing session for new user:", !!isNewUser)
 
+    // Check if adminAuth is available
+    if (!adminAuth) {
+      console.error("[Session API] Firebase Admin Auth not initialized")
+      return NextResponse.json(
+        { error: "Firebase Admin Auth not configured" },
+        { status: 503 }
+      )
+    }
+
     // Verify the ID token
     const decodedToken = await adminAuth.verifyIdToken(idToken)
     console.log("[Session API] Token verified for user:", decodedToken.uid)
@@ -53,8 +62,32 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch (error: any) {
     console.error("[Session API] Error creating session:", error)
+    console.error("[Session API] Error details:", {
+      message: error?.message,
+      code: error?.code,
+      stack: error?.stack
+    })
+
+    // Provide more specific error messages
+    if (
+      error?.code === "auth/invalid-id-token" ||
+      error?.code === "auth/id-token-expired"
+    ) {
+      return NextResponse.json(
+        { error: "Invalid or expired authentication token" },
+        { status: 401 }
+      )
+    }
+
+    if (error?.message?.includes("Firebase ID token has incorrect")) {
+      return NextResponse.json(
+        { error: "Token validation failed - project mismatch" },
+        { status: 401 }
+      )
+    }
+
     return NextResponse.json(
       { error: "Failed to create session" },
       { status: 401 }
