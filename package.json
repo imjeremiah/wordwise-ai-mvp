@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/kill-port.js 3005 && next dev -p 3005",
+    "dev": "node scripts/dev-with-logging.js",
+    "dev:no-log": "node scripts/kill-port.js 3005 && next dev -p 3005",
     "dev:no-kill": "next dev -p 3005",
     "build": "next build",
     "start": "next start -p 3005",
