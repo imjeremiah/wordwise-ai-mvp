@@ -50,10 +50,15 @@ if (!getApps().length) {
         console.log("[Firebase Config] Service account loaded successfully")
 
         initializeApp({
-          credential: cert(serviceAccount)
+          credential: cert(serviceAccount),
+          projectId: serviceAccount.project_id || "aivideoeduedu"
         })
 
         console.log("[Firebase Config] Firebase Admin initialized successfully")
+        console.log(
+          "[Firebase Config] Project ID:",
+          serviceAccount.project_id || "aivideoeduedu"
+        )
 
         // Initialize services after successful app initialization
         adminAuth = getAuth()
