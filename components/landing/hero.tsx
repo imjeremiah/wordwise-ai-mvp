@@ -127,7 +127,9 @@ export const HeroSection = () => {
               </svg>
             </span>{" "}
             <br />
-            <span className="text-muted-foreground">you'll own forever</span>
+            <span className="text-muted-foreground mt-3 inline-block">
+              you'll own forever
+            </span>
           </motion.h1>
 
           {/* Subheading */}
