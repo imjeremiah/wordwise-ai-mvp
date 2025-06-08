@@ -4,6 +4,12 @@ Global styles for the app with purple-centric design system.
 </ai_context>
 */
 
+/* Import custom fonts - must be at the very top */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+
+/* Import Editorial fonts for decorative text */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -183,4 +189,103 @@ Global styles for the app with purple-centric design system.
   .font-instrument-sans {
     font-family: var(--font-instrument-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
+}
+
+/* Enhanced shadow utilities from cco-vibe */
+.shadow-purple-sm {
+  box-shadow: 0 4px 20px rgba(147, 51, 234, 0.15);
+}
+
+.shadow-purple-md {
+  box-shadow: 0 10px 40px rgba(147, 51, 234, 0.3);
+}
+
+.shadow-purple-lg {
+  box-shadow: 0 15px 50px rgba(147, 51, 234, 0.4);
+}
+
+/* Enhanced glassmorphism navbar */
+.glass-navbar {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  box-shadow: inset 0px 2px 12px rgba(255, 255, 255, 0.8), 0px 8px 32px rgba(147, 51, 234, 0.08);
+}
+
+.glass-navbar.scrolled {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(147, 51, 234, 0.2);
+  box-shadow: inset 0px 2px 8px rgba(255, 255, 255, 0.6), 0px 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass-navbar {
+  background: rgba(20, 20, 20, 0.75);
+  box-shadow: inset 0px 2px 12px rgba(255, 255, 255, 0.1), 0px 8px 32px rgba(147, 51, 234, 0.08);
+}
+
+.dark .glass-navbar.scrolled {
+  background: rgba(20, 20, 20, 0.5);
+  box-shadow: inset 0px 2px 8px rgba(255, 255, 255, 0.05), 0px 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Marquee animation for testimonials */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 80s linear infinite;
+}
+
+/* Feature video container styles */
+.feature-video-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Tab indicator for features */
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(to right, #9333EA, #A855F7);
+  transition: all 0.3s ease;
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
 }

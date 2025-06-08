@@ -50,7 +50,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-            className="mb-6 text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl"
+            className="font-instrument mb-6 text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl"
           >
             Build{" "}
             <span className="relative">

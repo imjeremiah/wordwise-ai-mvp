@@ -5,9 +5,11 @@ It includes the Toaster, PostHog tracking, ThemeProvider, and beautiful gradient
 </ai_context>
 */
 
+"use server"
+
 import "./globals.css"
 
-import { Inter } from "next/font/google"
+import { Inter, Instrument_Sans } from "next/font/google"
 import { ReactNode } from "react"
 
 import { PostHogPageview } from "@/components/utilities/posthog/posthog-pageview"
@@ -16,7 +18,14 @@ import { Toaster } from "@/components/ui/sonner"
 import { Metadata } from "next"
 import { ThemeProvider } from "next-themes"
 
-// Load Inter font
+// Configure Instrument Sans font (from cco-vibe)
+const instrumentSans = Instrument_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-instrument"
+})
+
+// Keep Inter as fallback
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter"
@@ -56,7 +65,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} bg-background text-foreground overscroll-none font-sans antialiased`}
+        className={`${instrumentSans.className} ${instrumentSans.variable} ${inter.variable} bg-background text-foreground overscroll-none antialiased`}
       >
         {/* SVG Background */}
         <div className="fixed inset-0 -z-20 size-full">

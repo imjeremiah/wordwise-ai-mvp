@@ -83,7 +83,7 @@ export function Header() {
     return (
       <nav
         className={`glass-navbar fixed left-1/2 top-8 z-50 flex h-[58px] w-[95%] max-w-[1050px] -translate-x-1/2 items-center justify-between rounded-full px-3 py-1.5 transition-all duration-500 sm:px-4 ${
-          scrolled ? "translate-y-0 opacity-100" : "translate-y-0 opacity-100"
+          scrolled ? "scrolled" : ""
         }`}
       >
         <div className="flex h-[44px] w-[120px] items-center sm:w-[140px]">
@@ -108,7 +108,7 @@ export function Header() {
     <>
       <nav
         className={`glass-navbar fixed left-1/2 top-8 z-50 flex h-[58px] w-[95%] max-w-[1050px] -translate-x-1/2 items-center justify-between rounded-full px-3 py-1.5 transition-all duration-500 sm:px-4 ${
-          scrolled ? "translate-y-0 opacity-100" : "translate-y-0 opacity-100"
+          scrolled ? "scrolled" : ""
         }`}
       >
         <div className="flex h-[44px] w-[120px] items-center sm:w-[140px]">
@@ -128,25 +128,25 @@ export function Header() {
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-7 md:flex">
           <Link
-            className="font-geist text-[15px] font-medium text-purple-700/80 transition-colors duration-200 hover:text-purple-700"
+            className="font-instrument text-[15px] font-medium text-purple-700/80 transition-colors duration-200 hover:text-purple-700"
             href="/about"
           >
             About
           </Link>
           <Link
-            className="font-geist text-[15px] font-medium text-purple-700/80 transition-colors duration-200 hover:text-purple-700"
+            className="font-instrument text-[15px] font-medium text-purple-700/80 transition-colors duration-200 hover:text-purple-700"
             href="/services"
           >
             Services
           </Link>
           <Link
-            className="font-geist text-[15px] font-medium text-purple-700/80 transition-colors duration-200 hover:text-purple-700"
+            className="font-instrument text-[15px] font-medium text-purple-700/80 transition-colors duration-200 hover:text-purple-700"
             href="/#pricing"
           >
             Pricing
           </Link>
           <Link
-            className="font-geist text-[15px] font-medium text-purple-700/80 transition-colors duration-200 hover:text-purple-700"
+            className="font-instrument text-[15px] font-medium text-purple-700/80 transition-colors duration-200 hover:text-purple-700"
             href="/#faq"
           >
             FAQ

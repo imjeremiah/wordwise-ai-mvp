@@ -80,6 +80,9 @@ const config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
+        instrument: ["'Instrument Sans'", "sans-serif"],
+        editorial: ["'Playfair Display'", "serif"],
+        geist: ["var(--font-geist-sans)", "sans-serif"],
         mono: ["var(--font-mono)", ...fontFamily.mono]
       },
       keyframes: {
