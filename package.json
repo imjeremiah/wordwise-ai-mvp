@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/kill-port.js 3005 && next dev -p 3005",
+    "dev:no-kill": "next dev -p 3005",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3005",
     "lint": "next lint",
     "clean": "npm run lint:fix && npm run format:write",
     "type-check": "tsc --noEmit",
