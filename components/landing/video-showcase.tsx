@@ -11,7 +11,7 @@ export async function VideoShowcaseSection() {
   console.log("[VideoShowcaseSection] Rendering video showcase")
 
   return (
-    <div className="relative pb-32">
+    <div className="relative -mt-8 pb-32">
       <div className="container mx-auto max-w-6xl px-4">
         <div
           className="relative scale-100 overflow-hidden rounded-2xl border border-purple-200/20 opacity-100 shadow-2xl transition-all duration-700"

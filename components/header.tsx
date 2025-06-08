@@ -2,6 +2,7 @@
 <ai_context>
 This client component provides the header with Firebase auth functionality.
 Updated with beautiful glassmorphism navigation bar design.
+Now hides initially and shows after scrolling.
 </ai_context>
 */
 
@@ -37,6 +38,7 @@ export function Header() {
   const [loading, setLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [showNavbar, setShowNavbar] = useState(false)
 
   console.log("[Header] Component rendered")
 
@@ -56,8 +58,17 @@ export function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10)
+      const scrollY = window.scrollY
+      setScrolled(scrollY > 10)
+
+      // Show navbar after scrolling down 100px
+      if (scrollY > 100) {
+        setShowNavbar(true)
+      } else {
+        setShowNavbar(false)
+      }
     }
+
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
@@ -84,6 +95,10 @@ export function Header() {
       <nav
         className={`glass-navbar fixed left-1/2 top-8 z-50 flex h-[58px] w-[95%] max-w-[1050px] -translate-x-1/2 items-center justify-between rounded-full px-3 py-1.5 transition-all duration-500 sm:px-4 ${
           scrolled ? "scrolled" : ""
+        } ${
+          showNavbar
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-4 opacity-0"
         }`}
       >
         <div className="flex h-[44px] w-[120px] items-center sm:w-[140px]">
@@ -109,6 +124,10 @@ export function Header() {
       <nav
         className={`glass-navbar fixed left-1/2 top-8 z-50 flex h-[58px] w-[95%] max-w-[1050px] -translate-x-1/2 items-center justify-between rounded-full px-3 py-1.5 transition-all duration-500 sm:px-4 ${
           scrolled ? "scrolled" : ""
+        } ${
+          showNavbar
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-4 opacity-0"
         }`}
       >
         <div className="flex h-[44px] w-[120px] items-center sm:w-[140px]">
@@ -242,7 +261,7 @@ export function Header() {
       </nav>
 
       {/* Mobile Menu */}
-      {mobileMenuOpen && (
+      {mobileMenuOpen && showNavbar && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div
             className="fixed inset-0 bg-black/20 backdrop-blur-sm"

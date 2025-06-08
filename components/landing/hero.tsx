@@ -12,11 +12,55 @@ import { motion } from "framer-motion"
 import { Check, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import posthog from "posthog-js"
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
+import { auth } from "@/lib/firebase-client"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 export const HeroSection = () => {
-  const handleGetStartedClick = () => {
-    posthog.capture("clicked_get_started")
-    console.log("[HeroSection] Get started clicked")
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+
+  const handleGetStartedClick = async () => {
+    console.log("[HeroSection] Start building clicked - initiating Google auth")
+    setLoading(true)
+
+    try {
+      // Capture analytics event
+      posthog.capture("clicked_get_started")
+
+      // Initialize Google auth provider
+      const provider = new GoogleAuthProvider()
+
+      // Sign in with Google popup
+      const result = await signInWithPopup(auth, provider)
+      console.log("[HeroSection] Google auth successful:", result.user.uid)
+
+      // Get the ID token
+      const idToken = await result.user.getIdToken()
+
+      // Create session cookie
+      const response = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ idToken })
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to create session")
+      }
+
+      console.log("[HeroSection] Session created successfully")
+
+      // Redirect to dashboard
+      router.push("/dashboard")
+    } catch (error) {
+      console.error("[HeroSection] Auth error:", error)
+      // User cancelled or error occurred
+      setLoading(false)
+    }
   }
 
   return (
@@ -30,7 +74,7 @@ export const HeroSection = () => {
         />
       </div>
 
-      <div className="container relative z-10 pb-20 pt-32 md:pb-32 md:pt-40">
+      <div className="container relative z-10 py-20 md:pb-32 md:pt-28">
         <div className="mx-auto max-w-5xl text-center">
           {/* Trust badge */}
           <motion.div
@@ -128,18 +172,27 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
           >
-            <Link href="/contact" onClick={handleGetStartedClick}>
-              <Button
-                variant="gradient"
-                size="lg"
-                className="shadow-purple-md hover:shadow-purple-lg hover-lift group rounded-full bg-gradient-to-r from-purple-600 to-purple-500 px-8 py-6 text-lg font-medium text-white hover:from-purple-700 hover:to-purple-600"
-              >
-                <span className="flex items-center gap-3">
-                  Start building for free
-                  <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
-                </span>
-              </Button>
-            </Link>
+            <Button
+              onClick={handleGetStartedClick}
+              disabled={loading}
+              variant="gradient"
+              size="lg"
+              className="shadow-purple-md hover:shadow-purple-lg hover-lift group rounded-full bg-gradient-to-r from-purple-600 to-purple-500 px-8 py-6 text-lg font-medium text-white hover:from-purple-700 hover:to-purple-600"
+            >
+              <span className="flex items-center gap-3">
+                {loading ? (
+                  <>
+                    <div className="size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    Start building for free
+                    <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
+                  </>
+                )}
+              </span>
+            </Button>
             <p className="text-muted-foreground mt-4 text-sm">
               7-day free trial • No credit card required • Cancel anytime
             </p>
