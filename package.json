@@ -18,6 +18,7 @@
     "firebase:verify-auth": "node scripts/verify-firebase-auth.js",
     "firestore:setup": "node scripts/setup-firestore.js",
     "firestore:deploy-rules": "node scripts/deploy-firestore-rules.js",
+    "test:firebase": "tsx scripts/test-firebase.ts",
     "prepare": "husky install"
   },
   "dependencies": {
