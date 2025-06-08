@@ -74,6 +74,21 @@ export async function POST(request: NextRequest) {
           "[Session API] Failed to create profile:",
           profileResult.message
         )
+
+        // Check if it's a Firestore not enabled error
+        if (
+          profileResult.message.includes("Firestore is not enabled") ||
+          profileResult.message.includes("Firestore not enabled")
+        ) {
+          console.log("[Session API] Firestore is not enabled")
+          return NextResponse.json(
+            {
+              error:
+                "Firestore is not enabled. Please enable Firestore in your Firebase Console."
+            },
+            { status: 503 }
+          )
+        }
       } else {
         console.log("[Session API] Profile created successfully")
       }

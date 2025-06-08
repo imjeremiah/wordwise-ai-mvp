@@ -66,10 +66,13 @@ export async function createProfileAction(
       data: profileWithId
     }
   } catch (error: any) {
-    console.error("[Profiles Action] Error creating profile - Full error object:", error)
-    console.error("[Profiles Action] Error message:", error?.message)
-    console.error("[Profiles Action] Error code:", error?.code)
-    console.error("[Profiles Action] Error stack:", error?.stack)
+    // Simplify error logging to avoid source map issues in Next.js dev mode
+    console.error("[Profiles Action] Error creating profile:", error?.message || "Unknown error")
+    
+    // Log specific error properties separately to avoid formatting issues
+    if (error?.code) {
+      console.error("[Profiles Action] Error code:", error.code)
+    }
     
     // Check if it's a Firestore not enabled error
     if (error?.code === 5 || error?.code === 'NOT_FOUND' || error?.message?.includes('NOT_FOUND')) {
