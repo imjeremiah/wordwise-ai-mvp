@@ -8,101 +8,57 @@ It includes the Toaster, PostHog tracking, ThemeProvider, and beautiful gradient
 import "./globals.css"
 
 import { Inter } from "next/font/google"
-import localFont from "next/font/local"
 import { ReactNode } from "react"
 
 import { PostHogPageview } from "@/components/utilities/posthog/posthog-pageview"
 import { PostHogUserIdentify } from "@/components/utilities/posthog/posthog-user-identity"
 import { Toaster } from "@/components/ui/sonner"
-import { auth } from "@/lib/firebase-auth"
 import { Metadata } from "next"
 import { ThemeProvider } from "next-themes"
 
-// Load fonts
-const geistSans = localFont({
-  src: [
-    {
-      path: "../public/fonts/GeistVF.woff",
-      weight: "100 900"
-    }
-  ],
-  variable: "--font-geist-sans",
-  display: "swap"
-})
-
-const instrumentSans = localFont({
-  src: "../public/fonts/InstrumentSans-Regular.ttf",
-  variable: "--font-instrument-sans",
-  display: "swap"
-})
-
-// Fallback to Inter if custom fonts fail
+// Load Inter font
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap"
+  variable: "--font-inter"
 })
 
 export const metadata: Metadata = {
-  title: "CCO Vibe - Build Custom Apps 10x Faster",
+  title: "DevAgency - Build Custom Software You'll Own Forever",
   description:
-    "Custom AI-powered software development. Build internal tools, MVPs, and automation in 2 weeks instead of 4 months. 100% satisfaction guaranteed.",
+    "Stop paying monthly for generic SaaS. We build exactly what you need in 2 weeks, not 6 months. 100% ownership, no monthly fees ever.",
   keywords: [
-    "custom software development",
-    "AI development",
-    "MVP development",
-    "internal tools",
-    "automation",
-    "SaaS replacement"
+    "custom software",
+    "ai development",
+    "saas alternative",
+    "software ownership"
   ],
-  authors: [{ name: "CCO Vibe Team" }],
-  creator: "CCO Vibe",
-  robots: "index, follow",
   openGraph: {
-    title: "CCO Vibe - Build Custom Apps 10x Faster",
+    title: "DevAgency - Build Custom Software You'll Own Forever",
     description:
-      "Replace expensive SaaS with custom solutions. We build in 2 weeks what others deliver in 4 months. 100% satisfaction guaranteed.",
-    url: "https://ccovibe.com",
-    siteName: "CCO Vibe",
-    locale: "en_US",
+      "Stop paying monthly for generic SaaS. We build exactly what you need in 2 weeks.",
     type: "website",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "CCO Vibe - Custom Software Development"
-      }
-    ]
+    locale: "en_US",
+    siteName: "DevAgency"
   },
   twitter: {
     card: "summary_large_image",
-    creator: "@ccovibe",
-    title: "CCO Vibe - Build Custom Apps 10x Faster",
+    title: "DevAgency - Build Custom Software You'll Own Forever",
     description:
-      "Replace expensive SaaS with custom solutions. We build in 2 weeks what others deliver in 4 months.",
-    images: ["/og-image.png"]
-  },
-  category: "technology"
+      "Stop paying monthly for generic SaaS. We build exactly what you need in 2 weeks."
+  }
 }
 
-interface RootLayoutProps {
+export default async function RootLayout({
+  children
+}: {
   children: ReactNode
-}
-
-export default async function RootLayout({ children }: RootLayoutProps) {
-  const { userId } = await auth()
-
+}) {
   return (
-    <html
-      lang="en"
-      className={`${instrumentSans.variable} ${geistSans.variable} ${inter.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.className} bg-background text-foreground overscroll-none antialiased`}
+        className={`${inter.variable} bg-background text-foreground overscroll-none font-sans antialiased`}
       >
-        {/* Beautiful gradient background */}
+        {/* SVG Background */}
         <div className="fixed inset-0 -z-20 size-full">
           <svg
             className="absolute inset-0 size-full"
@@ -111,19 +67,31 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           >
             <defs>
               <radialGradient id="subtleBlue1" cx="25%" cy="25%">
-                <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.06" />
-                <stop offset="50%" stopColor="#2563EB" stopOpacity="0.03" />
-                <stop offset="100%" stopColor="#1E40AF" stopOpacity="0" />
+                <stop offset="0%" stopColor="#9333EA" stopOpacity="0.06"></stop>
+                <stop
+                  offset="50%"
+                  stopColor="#A855F7"
+                  stopOpacity="0.03"
+                ></stop>
+                <stop offset="100%" stopColor="#7C3AED" stopOpacity="0"></stop>
               </radialGradient>
               <radialGradient id="subtleBlue2" cx="75%" cy="35%">
-                <stop offset="0%" stopColor="#60A5FA" stopOpacity="0.05" />
-                <stop offset="50%" stopColor="#3B82F6" stopOpacity="0.02" />
-                <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
+                <stop offset="0%" stopColor="#A855F7" stopOpacity="0.05"></stop>
+                <stop
+                  offset="50%"
+                  stopColor="#9333EA"
+                  stopOpacity="0.02"
+                ></stop>
+                <stop offset="100%" stopColor="#7C3AED" stopOpacity="0"></stop>
               </radialGradient>
               <radialGradient id="subtleBlue3" cx="50%" cy="75%">
-                <stop offset="0%" stopColor="#93C5FD" stopOpacity="0.04" />
-                <stop offset="50%" stopColor="#60A5FA" stopOpacity="0.02" />
-                <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
+                <stop offset="0%" stopColor="#C084FC" stopOpacity="0.04"></stop>
+                <stop
+                  offset="50%"
+                  stopColor="#A855F7"
+                  stopOpacity="0.02"
+                ></stop>
+                <stop offset="100%" stopColor="#9333EA" stopOpacity="0"></stop>
               </radialGradient>
               <filter
                 id="softBlur"
@@ -132,7 +100,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 width="200%"
                 height="200%"
               >
-                <feGaussianBlur in="SourceGraphic" stdDeviation="100" />
+                <feGaussianBlur
+                  in="SourceGraphic"
+                  stdDeviation="100"
+                ></feGaussianBlur>
               </filter>
             </defs>
             <rect
@@ -140,7 +111,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               height="100%"
               fill="#FAFBFD"
               className="dark:fill-[#030712]"
-            />
+            ></rect>
             <ellipse
               cx="50%"
               cy="-10%"
@@ -148,7 +119,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               ry="60%"
               fill="url(#subtleBlue1)"
               filter="url(#softBlur)"
-            />
+            ></ellipse>
             <ellipse
               cx="20%"
               cy="50%"
@@ -156,7 +127,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               ry="60%"
               fill="url(#subtleBlue2)"
               filter="url(#softBlur)"
-            />
+            ></ellipse>
             <ellipse
               cx="80%"
               cy="70%"
@@ -164,23 +135,18 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               ry="70%"
               fill="url(#subtleBlue3)"
               filter="url(#softBlur)"
-            />
+            ></ellipse>
           </svg>
         </div>
 
         {/* Gradient overlay */}
-        <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-transparent via-transparent to-[#FAFBFD]/30 dark:to-[#030712]/30" />
+        <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-transparent via-transparent to-[#FAFBFD]/30 dark:to-[#030712]/30"></div>
 
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Toaster />
-          <PostHogPageview />
-          <PostHogUserIdentify />
+        <PostHogPageview />
+        <PostHogUserIdentify />
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
