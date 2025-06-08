@@ -31,7 +31,7 @@ export async function VideoShowcaseSection() {
               width={1920}
               height={1080}
               className="h-auto w-full"
-              src="/images/agency-dashboard.svg"
+              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&h=1080&fit=crop"
             />
 
             {/* Play button overlay */}

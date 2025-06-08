@@ -31,7 +31,8 @@ const projects: Project[] = [
     title: "AI Powered Analytics Platform",
     description:
       "Custom analytics with AI insights. Stop paying monthly for features you don't need.",
-    image: "/images/agency-dashboard.svg",
+    image:
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop",
     duration: "18 days",
     cost: "Own forever"
   },

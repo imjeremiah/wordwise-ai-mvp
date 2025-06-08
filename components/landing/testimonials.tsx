@@ -41,8 +41,9 @@ const testimonials: Testimonial[] = [
     company: "TechStartup",
     content:
       "They built our entire internal communication platform in 12 days. We're saving $50k/year compared to Slack. The AI features they added are incredible. Best decision we've made.",
-    videoPoster: "/images/testimonials/testimonial-1-poster.jpg",
-    videoSrc: "/videos/testimonials/testimonial-1.mp4",
+    videoPoster:
+      "https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=300&fit=crop",
+    videoSrc: "",
     likes: 892,
     retweets: 136,
     comments: 24,
@@ -57,8 +58,9 @@ const testimonials: Testimonial[] = [
     company: "Enterprise",
     content:
       "Replaced our $30k/year project management tool with a custom solution. It's faster, has better UX, and includes AI features we couldn't get anywhere else. Delivered in just 2 weeks!",
-    videoPoster: "/images/testimonials/testimonial-2-poster.jpg",
-    videoSrc: "/videos/testimonials/testimonial-2.mp4",
+    videoPoster:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop",
+    videoSrc: "",
     likes: 523,
     retweets: 97,
     comments: 18,
@@ -72,8 +74,9 @@ const testimonials: Testimonial[] = [
     company: "FinTech",
     content:
       "Built our MVP in 14 days. We went from idea to live product with real users. The AI powered analytics they included helped us find product market fit immediately. Worth every penny!",
-    videoPoster: "/images/testimonials/testimonial-3-poster.jpg",
-    videoSrc: "/videos/testimonials/testimonial-3.mp4",
+    videoPoster:
+      "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&h=300&fit=crop",
+    videoSrc: "",
     likes: 1243,
     retweets: 218,
     comments: 42,
@@ -88,8 +91,9 @@ const testimonials: Testimonial[] = [
     company: "Logistics",
     content:
       "Automated our entire inventory management system. What used to take 3 full time employees now runs automatically. ROI in less than 2 months. These guys are wizards!",
-    videoPoster: "/images/testimonials/testimonial-4-poster.jpg",
-    videoSrc: "/videos/testimonials/testimonial-4.mp4",
+    videoPoster:
+      "https://images.unsplash.com/photo-1565728744382-61accd4aa148?w=400&h=300&fit=crop",
+    videoSrc: "",
     likes: 789,
     retweets: 156,
     comments: 31,
@@ -104,8 +108,9 @@ const testimonials: Testimonial[] = [
     company: "SaaS",
     content:
       "They rebuilt our customer portal from scratch with AI support features. Customer satisfaction up 40%, support tickets down 60%. Delivered ahead of schedule too!",
-    videoPoster: "/images/testimonials/testimonial-5-poster.jpg",
-    videoSrc: "/videos/testimonials/testimonial-5.mp4",
+    videoPoster:
+      "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=400&h=300&fit=crop",
+    videoSrc: "",
     likes: 456,
     retweets: 89,
     comments: 27,
@@ -119,8 +124,9 @@ const testimonials: Testimonial[] = [
     company: "Manufacturing",
     content:
       "Custom ERP system that replaced 5 different tools we were using. Saves us $200k/year in licensing fees. The AI predictions for demand forecasting are game changing.",
-    videoPoster: "/images/testimonials/testimonial-6-poster.jpg",
-    videoSrc: "/videos/testimonials/testimonial-6.mp4",
+    videoPoster:
+      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop",
+    videoSrc: "",
     likes: 678,
     retweets: 124,
     comments: 38,
@@ -188,17 +194,25 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
           {testimonial.content}
         </div>
 
-        {/* Video */}
+        {/* Video/Image */}
         <div className="relative mb-3 flex-1 overflow-hidden rounded-xl border border-gray-200">
-          <video
-            className="size-full object-cover"
-            poster={testimonial.videoPoster}
-            controls
-            preload="metadata"
-          >
-            <source src={testimonial.videoSrc} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+          {testimonial.videoSrc ? (
+            <video
+              className="size-full object-cover"
+              poster={testimonial.videoPoster}
+              controls
+              preload="metadata"
+            >
+              <source src={testimonial.videoSrc} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <img
+              src={testimonial.videoPoster}
+              alt={`${testimonial.name}'s testimonial`}
+              className="size-full object-cover"
+            />
+          )}
         </div>
 
         {/* Actions */}
