@@ -74,6 +74,7 @@ firebase-boilerplate/
 │   └── hooks/             # Additional hooks
 │
 ├── prompts/                # AI prompts
+│   └── frontend.mdc        # Frontend component design system based on hero section patterns
 │
 ├── public/                 # Static assets
 │   ├── favicon.ico        # Site favicon
