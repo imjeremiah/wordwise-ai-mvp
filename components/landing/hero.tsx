@@ -1,150 +1,184 @@
 /*
 <ai_context>
 This client component provides the hero section for the landing page.
+Updated with beautiful purple-centric design and animations.
 </ai_context>
 */
 
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
-import { ChevronRight, Rocket, Github, Check } from "lucide-react"
-import Image from "next/image"
+import { Check, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import posthog from "posthog-js"
-import AnimatedGradientText from "../magicui/animated-gradient-text"
-import HeroVideoDialog from "../magicui/hero-video-dialog"
 
 export const HeroSection = () => {
   const handleGetStartedClick = () => {
     posthog.capture("clicked_get_started")
+    console.log("[HeroSection] Get started clicked")
   }
 
   return (
-    <section className="relative px-4 py-16 md:py-24">
-      {/* Background gradient */}
-      <div className="to-background absolute inset-0 -z-10 bg-gradient-to-b from-purple-50/50" />
+    <section className="relative">
+      {/* Background decorations */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute left-[10%] top-20 size-72 animate-pulse rounded-full bg-purple-200/20 blur-3xl" />
+        <div
+          className="absolute right-[15%] top-40 size-96 animate-pulse rounded-full bg-purple-300/20 blur-3xl"
+          style={{ animationDelay: "2s" }}
+        />
+      </div>
 
-      <div className="container mx-auto max-w-7xl">
-        <div className="flex flex-col items-center justify-center text-center">
+      <div className="container relative z-10 pb-20 pt-32 md:pb-32 md:pt-40">
+        <div className="mx-auto max-w-5xl text-center">
           {/* Trust badge */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="mb-8 flex items-center justify-center"
-          >
-            <div className="inline-flex items-center gap-2 rounded-full border border-purple-200/30 bg-white/50 px-4 py-2 backdrop-blur-sm">
-              <div className="size-2 animate-pulse rounded-full bg-gradient-to-r from-purple-600 to-purple-400" />
-              <span className="text-muted-foreground text-sm font-medium">
-                Trusted by 100+ businesses
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Main heading */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="mb-6"
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="mb-8 inline-flex items-center gap-2 rounded-full border border-purple-200/30 bg-white/50 px-4 py-2 backdrop-blur-sm dark:bg-gray-900/50"
           >
-            <h1 className="text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
-              <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
-                Build your SaaS
-              </span>
-              <br />
-              in just 2 weeks
-            </h1>
+            <div className="size-2 animate-pulse rounded-full bg-gradient-to-r from-purple-600 to-purple-400" />
+            <span className="text-muted-foreground text-sm font-medium">
+              Trusted by 100+ businesses saving millions
+            </span>
           </motion.div>
 
-          {/* Subheading */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-            className="mb-8 max-w-2xl"
+          {/* Main heading */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
+            className="mb-6 text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl"
           >
-            <p className="text-muted-foreground text-lg leading-relaxed md:text-xl">
-              Production-ready Firebase boilerplate with authentication,
-              payments, and everything you need to launch your startup fast.
-            </p>
-          </motion.div>
+            Build{" "}
+            <span className="relative">
+              <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
+                custom software
+              </span>
+              <svg
+                className="absolute -bottom-2 left-0 w-full"
+                viewBox="0 0 300 12"
+                fill="none"
+              >
+                <path
+                  d="M2 9C2 9 75 3 150 3C225 3 298 9 298 9"
+                  stroke="url(#paint0_linear)"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                <defs>
+                  <linearGradient
+                    id="paint0_linear"
+                    x1="2"
+                    y1="9"
+                    x2="298"
+                    y2="9"
+                  >
+                    <stop stopColor="#9333EA" />
+                    <stop offset="1" stopColor="#A855F7" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </span>{" "}
+            <br />
+            <span className="text-muted-foreground">you'll own forever</span>
+          </motion.h1>
+
+          {/* Subheading */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+            className="text-muted-foreground mx-auto mb-10 max-w-2xl text-xl leading-relaxed md:text-2xl"
+          >
+            Stop paying monthly for generic SaaS. We build exactly what you need
+            in <span className="text-foreground font-semibold">2 weeks</span>,
+            not 6 months.
+          </motion.p>
 
           {/* Feature pills */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
             className="mb-10 flex flex-wrap justify-center gap-3"
           >
-            {["Firebase Auth", "Stripe Payments", "Production Ready"].map(
-              (feature, index) => (
-                <div
-                  key={feature}
-                  className="flex items-center gap-2 rounded-full bg-purple-50 px-4 py-2"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <Check className="size-4 text-purple-600" />
-                  <span className="text-sm font-medium text-purple-900">
-                    {feature}
-                  </span>
-                </div>
-              )
-            )}
+            {[
+              "No monthly fees ever",
+              "Built by AI experts",
+              "100% satisfaction guarantee"
+            ].map((feature, index) => (
+              <div
+                key={feature}
+                className="flex items-center gap-2 rounded-full bg-purple-50 px-4 py-2"
+              >
+                <Check className="size-4 text-purple-600" />
+                <span className="text-sm font-medium text-purple-900">
+                  {feature}
+                </span>
+              </div>
+            ))}
           </motion.div>
 
-          {/* CTA Buttons */}
+          {/* CTA Button */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" }}
-            className="mb-16 flex flex-col gap-4 sm:flex-row"
+            transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
           >
-            <Link href="/dashboard" onClick={handleGetStartedClick}>
-              <Button variant="gradient" size="lg" className="group">
+            <Link href="#consultation-form" onClick={handleGetStartedClick}>
+              <Button
+                variant="gradient"
+                size="lg"
+                className="shadow-purple-md hover:shadow-purple-lg hover-lift group rounded-full bg-gradient-to-r from-purple-600 to-purple-500 px-8 py-6 text-lg font-medium text-white hover:from-purple-700 hover:to-purple-600"
+              >
                 <span className="flex items-center gap-3">
-                  Get Started
-                  <svg
-                    className="size-5 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
+                  Start building for free
+                  <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
                 </span>
               </Button>
             </Link>
-
-            <Link href="https://github.com/ReeceHarding/firebase-boilerplate">
-              <Button variant="outline" size="lg">
-                <Github className="mr-2 size-5" />
-                View on GitHub
-              </Button>
-            </Link>
+            <p className="text-muted-foreground mt-4 text-sm">
+              7-day free trial • No credit card required • Cancel anytime
+            </p>
           </motion.div>
 
-          {/* Video preview */}
+          {/* Social proof avatars */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1, ease: "easeOut" }}
-            className="w-full max-w-5xl"
+            transition={{ duration: 0.7, delay: 0.5, ease: "easeOut" }}
+            className="mt-16 flex items-center justify-center gap-6"
           >
-            <div className="relative overflow-hidden rounded-2xl border border-purple-100/20 shadow-2xl shadow-purple-500/10">
-              <HeroVideoDialog
-                animationStyle="top-in-bottom-out"
-                videoSrc="https://www.youtube.com/embed/9yS0dR0kP-s"
-                thumbnailSrc="/hero.png"
-                thumbnailAlt="Hero Video"
-              />
+            <div className="flex -space-x-3">
+              {["elonmusk", "sama", "naval", "paulg", "patrickc"].map(
+                (handle, i) => (
+                  <img
+                    key={handle}
+                    src={`https://unavatar.io/twitter/${handle}`}
+                    alt="User avatar"
+                    className="size-10 rounded-full border-2 border-white shadow-sm"
+                  />
+                )
+              )}
+            </div>
+            <div className="text-left">
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className="size-4 fill-current text-yellow-400"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Loved by 100+ businesses
+              </p>
             </div>
           </motion.div>
         </div>

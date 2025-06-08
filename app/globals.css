@@ -1,6 +1,6 @@
 /*
 <ai_context>
-Global styles for the app.
+Global styles for the app with purple-centric design system.
 </ai_context>
 */
 
@@ -10,17 +10,18 @@ Global styles for the app.
 
 @layer base {
   :root {
+    /* Light mode - matching the beautiful design */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 271 91% 65%;
+    --primary: 271 91% 65%; /* Purple-600 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 271 91% 95%;
+    --secondary: 271 91% 95%; /* Purple-50 */
     --secondary-foreground: 271 91% 20%;
-    --muted: 210 40% 96.1%;
+    --muted: 249 31% 98%; /* #FAFBFD */
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 271 91% 95%;
     --accent-foreground: 271 91% 20%;
@@ -46,7 +47,8 @@ Global styles for the app.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* Dark mode - matching the design */
+    --background: 224 71% 4%; /* #030712 */
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
@@ -86,7 +88,7 @@ Global styles for the app.
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased overscroll-none;
   }
 }
 
@@ -100,9 +102,22 @@ Global styles for the app.
     @apply border border-white/20 dark:border-gray-700/20;
   }
   
+  .glass-navbar {
+    @apply backdrop-blur-[10px] bg-[rgba(255,255,255,0.75)] dark:bg-[rgba(20,20,20,0.75)] border-[rgba(147,51,234,0.3)] shadow-[inset_0px_2px_12px_rgba(255,255,255,0.8),0px_8px_32px_rgba(147,51,234,0.08)];
+  }
+  
   /* Gradient text utility */
   .gradient-text {
     @apply bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent;
+  }
+  
+  /* Purple gradient backgrounds */
+  .gradient-purple {
+    @apply bg-gradient-to-r from-purple-600 to-purple-500;
+  }
+  
+  .gradient-purple-hover {
+    @apply hover:from-purple-700 hover:to-purple-600;
   }
   
   /* Custom animations */
@@ -117,6 +132,20 @@ Global styles for the app.
     animation: draw 0.5s ease-out forwards;
   }
   
+  /* Marquee animation */
+  .animate-marquee {
+    animation: marquee var(--duration) linear infinite;
+  }
+  
+  @keyframes marquee {
+    from {
+      transform: translateX(0%);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  
   /* Hide scrollbar */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -124,5 +153,34 @@ Global styles for the app.
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  
+  /* Custom shadow utilities */
+  .shadow-purple-sm {
+    box-shadow: 0 4px 20px rgba(147, 51, 234, 0.15);
+  }
+  
+  .shadow-purple-md {
+    box-shadow: 0 10px 40px rgba(147, 51, 234, 0.3);
+  }
+  
+  .shadow-purple-lg {
+    box-shadow: 0 15px 50px rgba(147, 51, 234, 0.4);
+  }
+  
+  /* Hover lift effect */
+  .hover-lift {
+    @apply transform hover:-translate-y-0.5 transition-all duration-200;
+  }
+}
+
+/* Custom font styles */
+@layer base {
+  .font-geist-sans {
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  
+  .font-instrument-sans {
+    font-family: var(--font-instrument-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 }

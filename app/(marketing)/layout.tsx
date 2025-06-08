@@ -1,6 +1,7 @@
 /*
 <ai_context>
 This server layout provides a shared header and basic structure for (marketing) routes.
+Updated to work with the fixed glassmorphism navigation.
 </ai_context>
 */
 
@@ -12,10 +13,9 @@ export default async function MarketingLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <>
       <Header />
-
-      <div className="flex-1">{children}</div>
-    </div>
+      <main className="relative min-h-screen overflow-hidden">{children}</main>
+    </>
   )
 }
