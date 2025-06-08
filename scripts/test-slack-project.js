@@ -32,7 +32,7 @@ async function testSlackProject() {
     await docRef.delete();
     console.log('[Slack Test] ✅ Cleanup successful!');
     
-    console.log('\n🎉 SUCCESS! The slack-clone project is working correctly!');
+    console.log('\n SUCCESS! The slack-clone project is working correctly!');
     console.log('Firestore is properly configured in Native mode.');
     console.log('\nYou can now run: npm run dev');
     

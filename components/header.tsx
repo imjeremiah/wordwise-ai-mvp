@@ -107,10 +107,14 @@ export function Header() {
             href="/"
           >
             <div className="flex items-center gap-2">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-purple-400 shadow-sm">
-                <Code2 className="size-5 text-white" />
+              <div className="flex size-8 items-center justify-center rounded-lg border border-purple-600 bg-white shadow-sm">
+                <span className="font-instrument text-lg font-bold text-purple-600">
+                  FB
+                </span>
               </div>
-              <span className="text-lg font-semibold">CCO Vibe</span>
+              <span className="font-instrument text-xl font-semibold text-black">
+                Firebase Boilerplate
+              </span>
             </div>
           </Link>
         </div>
@@ -136,10 +140,14 @@ export function Header() {
             href="/"
           >
             <div className="flex items-center gap-2">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-purple-400 shadow-sm">
-                <Code2 className="size-5 text-white" />
+              <div className="flex size-8 items-center justify-center rounded-lg border border-purple-600 bg-white shadow-sm">
+                <span className="font-instrument text-lg font-bold text-purple-600">
+                  FB
+                </span>
               </div>
-              <span className="text-lg font-semibold">CCO Vibe</span>
+              <span className="font-instrument text-xl font-semibold text-black">
+                Firebase Boilerplate
+              </span>
             </div>
           </Link>
         </div>
@@ -178,15 +186,15 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative size-9 rounded-full border border-purple-200/30 transition-all duration-200 hover:bg-purple-100/50 dark:border-purple-700/30 dark:hover:bg-purple-900/30"
+                  className="relative size-9 rounded-full border border-gray-200 transition-all duration-200 hover:bg-gray-50 dark:border-purple-700/30 dark:hover:bg-purple-900/30"
                 >
-                  <Avatar className="size-8">
+                  <Avatar className="relative size-9 rounded-full border border-gray-200 transition-all duration-200 hover:bg-gray-50">
                     <AvatarImage
-                      src={user.photoURL || undefined}
+                      src={user.photoURL || ""}
                       alt={user.displayName || "User"}
                     />
-                    <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-400 text-sm text-white">
-                      {user.email?.charAt(0).toUpperCase() || "U"}
+                    <AvatarFallback className="bg-purple-600 text-sm text-white">
+                      {user.displayName?.[0] || user.email?.[0] || "U"}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -202,7 +210,7 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link
                     href="/dashboard"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-purple-50 hover:text-purple-600"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-50 hover:text-black"
                   >
                     <Home className="size-4" />
                     <span>Dashboard</span>
@@ -211,7 +219,7 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link
                     href="/dashboard/billing"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-purple-50 hover:text-purple-600"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-50 hover:text-black"
                   >
                     <CreditCard className="size-4" />
                     <span>Billing</span>
@@ -248,7 +256,7 @@ export function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex size-9 items-center justify-center rounded-xl border border-purple-200/30 bg-purple-50/50 transition-all duration-200 hover:bg-purple-100/50 md:hidden dark:border-purple-700/30 dark:bg-purple-900/20 dark:hover:bg-purple-900/30"
+            className="flex size-9 items-center justify-center rounded-xl border border-gray-200 bg-white transition-all duration-200 hover:bg-gray-50 md:hidden"
             aria-label="Menu"
           >
             {mobileMenuOpen ? (
@@ -302,7 +310,7 @@ export function Header() {
                   <Button
                     variant="ghost"
                     asChild
-                    className="w-full justify-center hover:bg-purple-50 hover:text-purple-600"
+                    className="w-full justify-center hover:bg-gray-50 hover:text-black"
                   >
                     <Link
                       href="/login"

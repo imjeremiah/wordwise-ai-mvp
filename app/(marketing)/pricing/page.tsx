@@ -30,19 +30,14 @@ export default async function PricingPage() {
   }
 
   return (
-    <section className="to-background bg-gradient-to-b from-purple-50/30 py-16 md:py-24">
-      <div className="container max-w-6xl">
-        {/* Header */}
-        <div className="mb-16 text-center">
-          <h2 className="mb-4 font-mono text-sm font-bold uppercase tracking-wider text-purple-600">
-            PRICING
-          </h2>
-          <h1 className="mb-6 text-4xl font-semibold sm:text-5xl md:text-6xl">
-            Simple, transparent pricing
+    <section className="bg-white py-16 md:py-24">
+      <div className="container max-w-5xl">
+        <div className="mb-12 text-center">
+          <h1 className="font-instrument mb-4 text-5xl font-bold tracking-tight text-black">
+            Simple, Transparent Pricing
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed md:text-xl">
-            Choose the plan that's right for you. No hidden fees, cancel
-            anytime.
+          <p className="text-muted-foreground text-xl">
+            Choose the perfect plan for your project. No hidden fees.
           </p>
         </div>
 
@@ -133,8 +128,8 @@ function PricingCard({
   return (
     <div className="group relative">
       {recommended && (
-        <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-600 to-purple-400 px-5 py-2 text-[13px] font-semibold text-white shadow-lg">
-          RECOMMENDED
+        <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2 rounded-full bg-purple-600 px-5 py-2 text-[13px] font-semibold text-white shadow-lg">
+          Most Popular
         </div>
       )}
 
@@ -153,9 +148,7 @@ function PricingCard({
             {description}
           </CardDescription>
           <div className="flex items-baseline justify-center gap-1">
-            <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-5xl font-bold text-transparent">
-              {price}
-            </span>
+            <span className="text-5xl font-bold text-purple-600">{price}</span>
             <span className="text-muted-foreground text-lg">{period}</span>
           </div>
         </CardHeader>
@@ -165,8 +158,8 @@ function PricingCard({
           <ul className="space-y-3">
             {features.map((feature, index) => (
               <li key={index} className="flex items-start gap-3">
-                <div className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-purple-100">
-                  <Check className="size-3 text-purple-600" />
+                <div className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-purple-50">
+                  <Check className="size-3.5 text-purple-600" />
                 </div>
                 <span className="text-muted-foreground text-sm">{feature}</span>
               </li>

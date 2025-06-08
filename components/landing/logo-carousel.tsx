@@ -9,14 +9,14 @@ This client component provides a scrolling logo carousel for the landing page.
 import { motion } from "framer-motion"
 
 const logos = [
-  { name: "TechCorp", logo: "🏢" },
-  { name: "StartupXYZ", logo: "🚀" },
-  { name: "DesignStudio", logo: "🎨" },
-  { name: "DevAgency", logo: "💻" },
-  { name: "CloudTech", logo: "☁️" },
-  { name: "DataFlow", logo: "📊" },
-  { name: "BuildCo", logo: "🏗️" },
-  { name: "CodeCraft", logo: "⚡" }
+  { name: "TechCorp", logo: "TC" },
+  { name: "StartupXYZ", logo: "SX" },
+  { name: "DesignStudio", logo: "DS" },
+  { name: "CloudBase", logo: "CB" },
+  { name: "InnovateLab", logo: "IL" },
+  { name: "DataFlow", logo: "DF" },
+  { name: "NextGen", logo: "NG" },
+  { name: "CodeCraft", logo: "CC" }
 ]
 
 // Duplicate logos for seamless scroll

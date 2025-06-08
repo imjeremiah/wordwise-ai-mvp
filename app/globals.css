@@ -178,6 +178,21 @@ Global styles for the app with purple-centric design system.
   .hover-lift {
     @apply transform hover:-translate-y-0.5 transition-all duration-200;
   }
+
+  /* Text gradient - update to use purple color instead of gradient */
+  .text-gradient {
+    @apply text-purple-600 font-semibold;
+  }
+
+  /* Button gradient - converted to solid purple */
+  .btn-gradient {
+    @apply bg-purple-600 text-white;
+  }
+
+  /* Card gradient */
+  .card-gradient {
+    @apply bg-white/80 backdrop-blur-sm;
+  }
 }
 
 /* Custom font styles */

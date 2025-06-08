@@ -27,8 +27,10 @@ import {
   ArrowRight,
   Github,
   Twitter,
-  Linkedin
+  Linkedin,
+  Lightbulb
 } from "lucide-react"
+import { motion } from "framer-motion"
 
 export default async function AboutPage() {
   console.log("[About Page] Rendering about page")
@@ -64,39 +66,30 @@ export default async function AboutPage() {
     }
   ]
 
-  const teamMembers = [
+  const team = [
     {
-      name: "Alex Johnson",
-      role: "Founder & CEO",
-      avatar: "👨‍💻",
-      bio: "Full-stack developer with 10+ years building SaaS products",
-      social: {
-        twitter: "#",
-        github: "#",
-        linkedin: "#"
-      }
+      name: "Sarah Johnson",
+      role: "CEO & Founder",
+      bio: "Visionary leader with 15+ years in tech innovation",
+      avatar: "/avatars/sarah.jpg"
     },
     {
-      name: "Sarah Chen",
-      role: "Lead Engineer",
-      avatar: "👩‍💻",
-      bio: "Firebase expert and performance optimization enthusiast",
-      social: {
-        twitter: "#",
-        github: "#",
-        linkedin: "#"
-      }
+      name: "Michael Chen",
+      role: "CTO",
+      bio: "Full-stack expert passionate about scalable architecture",
+      avatar: "/avatars/michael.jpg"
     },
     {
-      name: "Mike Rodriguez",
+      name: "Emily Rodriguez",
       role: "Head of Design",
-      avatar: "🎨",
-      bio: "Creating beautiful, functional interfaces for modern web apps",
-      social: {
-        twitter: "#",
-        github: "#",
-        linkedin: "#"
-      }
+      bio: "Creative mind behind our intuitive user experiences",
+      avatar: "/avatars/emily.jpg"
+    },
+    {
+      name: "David Kim",
+      role: "Lead Developer",
+      bio: "Open source contributor and performance optimization guru",
+      avatar: "/avatars/david.jpg"
     }
   ]
 
@@ -110,13 +103,18 @@ export default async function AboutPage() {
   return (
     <div className="py-16 md:py-24">
       {/* Hero Section */}
-      <section className="relative mb-16 md:mb-24">
-        <div className="to-background absolute inset-0 -z-10 bg-gradient-to-b from-purple-50/50" />
-
-        <div className="container max-w-6xl">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="mb-4 font-mono text-sm font-bold uppercase tracking-wider text-purple-600">
-              ABOUT US
+      <section className="relative bg-white py-24">
+        <div className="absolute inset-0 -z-10 bg-white" />
+        <div className="mx-auto max-w-6xl px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center"
+          >
+            <h1 className="font-instrument mb-6 text-6xl font-bold leading-tight tracking-tight text-black">
+              Building the Future of{" "}
+              <span className="text-purple-600">Digital Experiences</span>
             </h1>
 
             <h2 className="mb-6 text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl">
@@ -150,7 +148,7 @@ export default async function AboutPage() {
                 </Button>
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -164,10 +162,10 @@ export default async function AboutPage() {
                 className="border-purple-100/20 bg-white/80 text-center backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(147,51,234,0.15)] dark:bg-gray-900/80"
               >
                 <CardHeader className="pb-2">
-                  <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-400 shadow-lg shadow-purple-500/20">
-                    <stat.icon className="size-6 text-white" />
+                  <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full border border-purple-600 bg-white shadow-sm">
+                    <Lightbulb className="size-6 text-purple-600" />
                   </div>
-                  <CardTitle className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-3xl font-bold text-transparent">
+                  <CardTitle className="text-3xl font-bold text-purple-600">
                     {stat.value}
                   </CardTitle>
                 </CardHeader>
@@ -181,7 +179,7 @@ export default async function AboutPage() {
       </section>
 
       {/* Mission Section */}
-      <section className="to-background mb-16 bg-gradient-to-b from-purple-50/30 py-16 md:mb-24 md:py-24">
+      <section className="bg-white py-16 md:mb-24 md:py-24">
         <div className="container max-w-4xl">
           <div className="text-center">
             <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-purple-200/30 bg-white/50 px-4 py-2 backdrop-blur-sm">
@@ -227,26 +225,13 @@ export default async function AboutPage() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {values.map((value, index) => (
               <div key={value.title} className="group relative">
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-400 opacity-0 transition-opacity duration-300 group-hover:opacity-10" />
+                <div className="absolute inset-0 rounded-2xl bg-white opacity-0 transition-opacity duration-300 group-hover:opacity-10" />
 
-                <div className="relative rounded-2xl border border-purple-100/20 bg-white/50 p-8 backdrop-blur-sm transition-all duration-300 hover:border-purple-300/40 dark:bg-gray-900/50">
-                  <div className="flex items-start gap-4">
-                    <div className="shrink-0">
-                      <div
-                        className={`flex size-14 items-center justify-center rounded-full bg-gradient-to-r ${value.gradient} shadow-lg shadow-purple-500/20`}
-                      >
-                        <value.icon className="size-7 text-white" />
-                      </div>
-                    </div>
-
-                    <div className="flex-1">
-                      <h4 className="mb-2 text-xl font-semibold">
-                        {value.title}
-                      </h4>
-                      <p className="text-muted-foreground leading-relaxed">
-                        {value.description}
-                      </p>
-                    </div>
+                <div className="relative text-center">
+                  <div
+                    className={`mx-auto flex size-14 items-center justify-center rounded-full border border-purple-600 bg-white shadow-lg`}
+                  >
+                    <value.icon className="size-6 text-purple-600" />
                   </div>
                 </div>
               </div>
@@ -268,14 +253,14 @@ export default async function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {teamMembers.map((member, index) => (
+            {team.map((member, index) => (
               <Card
                 key={member.name}
                 className="border-purple-100/20 bg-white/80 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(147,51,234,0.15)] dark:bg-gray-900/80"
               >
                 <CardHeader className="text-center">
-                  <div className="mx-auto mb-4 flex size-24 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-400 text-4xl shadow-lg shadow-purple-500/20">
-                    {member.avatar}
+                  <div className="mx-auto mb-4 flex size-24 items-center justify-center rounded-full border-2 border-purple-600 bg-white text-4xl shadow-lg">
+                    {member.name.charAt(0)}
                   </div>
                   <CardTitle className="text-xl">{member.name}</CardTitle>
                   <CardDescription className="font-medium text-purple-600">
@@ -286,26 +271,6 @@ export default async function AboutPage() {
                   <p className="text-muted-foreground mb-4 text-sm">
                     {member.bio}
                   </p>
-                  <div className="flex justify-center gap-3">
-                    <Link
-                      href={member.social.twitter}
-                      className="text-muted-foreground transition-colors hover:text-purple-600"
-                    >
-                      <Twitter className="size-5" />
-                    </Link>
-                    <Link
-                      href={member.social.github}
-                      className="text-muted-foreground transition-colors hover:text-purple-600"
-                    >
-                      <Github className="size-5" />
-                    </Link>
-                    <Link
-                      href={member.social.linkedin}
-                      className="text-muted-foreground transition-colors hover:text-purple-600"
-                    >
-                      <Linkedin className="size-5" />
-                    </Link>
-                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -314,26 +279,22 @@ export default async function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="mx-4 rounded-3xl bg-gradient-to-r from-purple-600 to-purple-400 py-16 md:mx-8 md:py-24">
-        <div className="container max-w-4xl text-center text-white">
-          <h3 className="mb-6 text-3xl font-bold md:text-4xl">
-            Ready to build something amazing?
-          </h3>
-          <p className="mb-8 text-lg text-purple-100 md:text-xl">
-            Join thousands of developers who are shipping faster with our
-            boilerplate.
+      <section className="mx-4 rounded-3xl bg-purple-600 py-16 md:mx-8 md:py-24">
+        <div className="mx-auto max-w-4xl text-center text-white">
+          <h2 className="font-instrument mb-6 text-4xl font-bold md:text-5xl">
+            Ready to Build Something Amazing?
+          </h2>
+          <p className="mb-8 text-xl text-purple-100">
+            Join thousands of developers who are already creating incredible
+            products with our platform.
           </p>
-          <Link href="/dashboard">
-            <Button
-              size="lg"
-              className="bg-white text-purple-600 shadow-xl transition-all duration-200 hover:-translate-y-0.5 hover:bg-purple-50 hover:shadow-2xl"
-            >
-              <span className="flex items-center gap-3 font-semibold">
-                Start Building Today
-                <ArrowRight className="size-5" />
-              </span>
-            </Button>
-          </Link>
+          <Button
+            size="lg"
+            className="bg-white text-purple-600 shadow-xl transition-all duration-200 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-2xl"
+          >
+            Get Started Today
+            <ArrowRight className="ml-2 size-5" />
+          </Button>
         </div>
       </section>
     </div>

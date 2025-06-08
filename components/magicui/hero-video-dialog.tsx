@@ -100,16 +100,30 @@ export default function HeroVideoDialog({
           />
         </div>
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex size-28 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm transition-all duration-300 ease-out group-hover:scale-110">
-            <div className="shadow-purple-md group-hover:shadow-purple-lg flex size-20 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-500 transition-all duration-300 ease-out group-hover:scale-110">
-              <Play
-                className="size-8 fill-white text-white transition-transform duration-300 ease-out group-hover:scale-110"
-                style={{
-                  filter:
-                    "drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06))"
-                }}
-              />
-            </div>
+          <div className="relative flex size-full cursor-pointer items-center justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={isVideoOpen ? "playing" : "not-playing"}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="absolute flex items-center justify-center"
+              >
+                <div className="flex size-20 items-center justify-center rounded-full border-2 border-purple-600 bg-white shadow-lg transition-all duration-300 ease-out group-hover:scale-110">
+                  {isVideoOpen ? (
+                    <XIcon className="size-8 text-purple-600" />
+                  ) : (
+                    <Play
+                      className="ml-0.5 size-8 text-purple-600"
+                      style={{
+                        filter:
+                          "drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06))"
+                      }}
+                    />
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>

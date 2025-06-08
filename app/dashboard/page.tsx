@@ -17,7 +17,8 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
+  CardFooter
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -36,10 +37,13 @@ import {
   Info,
   Zap,
   Users,
-  ShoppingCart
+  ShoppingCart,
+  FolderOpen,
+  ArrowRight
 } from "lucide-react"
 import { Suspense } from "react"
-import { FirestoreSetupNotice } from "@/components/utilities/firestore-setup-notice"
+import FirestoreSetupNotice from "@/components/utilities/firestore-setup-notice"
+import { motion } from "framer-motion"
 
 async function DashboardContent() {
   console.log("[Dashboard Page] Checking authentication")
@@ -166,51 +170,53 @@ async function DashboardContent() {
     }
   ]
 
+  const recentActivities = [
+    {
+      title: "New Project Started",
+      description: "You've started a new project",
+      time: "10:00 AM"
+    },
+    {
+      title: "Payment Received",
+      description: "You've received a payment",
+      time: "11:00 AM"
+    },
+    {
+      title: "New Message",
+      description: "You've received a new message",
+      time: "12:00 PM"
+    }
+  ]
+
   return (
     <div className="space-y-8">
       {/* Welcome Section with gradient */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-purple-500 to-purple-700 p-10 text-white shadow-[0_20px_50px_rgba(147,51,234,0.3)]">
-        <div className="relative z-10">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="font-instrument mb-3 text-4xl font-bold tracking-tight">
-                Welcome back, {profile?.displayName || "User"}! 👋
-              </h1>
-              <p className="max-w-2xl text-lg text-purple-100">
-                Here's what's happening with your business today. Your dashboard
-                is looking great!
-              </p>
-            </div>
-
-            {/* Quick stat highlight */}
-            <div className="hidden text-right lg:block">
-              <div className="inline-flex items-center gap-2 rounded-2xl bg-white/20 px-5 py-3 backdrop-blur-sm">
-                <Zap className="size-5 text-yellow-300" />
-                <div>
-                  <p className="text-sm font-medium text-purple-100">
-                    Growth Rate
-                  </p>
-                  <p className="text-2xl font-bold">+24.5%</p>
-                </div>
-              </div>
-            </div>
-          </div>
+      <Card className="relative overflow-hidden rounded-3xl border-2 border-purple-600 bg-white p-10 shadow-lg">
+        {/* Background pattern */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(147, 51, 234, 0.05) 35px, rgba(147, 51, 234, 0.05) 70px)"
+          }}
+        />
+        <div className="relative">
+          <h1 className="font-instrument mb-2 text-5xl font-bold tracking-tight text-black">
+            Welcome back, {profile?.displayName || "User"}!
+          </h1>
+          <p className="mb-8 text-xl text-gray-600">
+            Your dashboard is ready with all the tools you need.
+          </p>
+          <Button
+            size="lg"
+            className="bg-purple-600 text-white shadow-lg hover:bg-purple-700 hover:shadow-xl"
+          >
+            Get Started
+            <ArrowRight className="ml-2 size-5" />
+          </Button>
         </div>
-
-        {/* Decorative elements */}
-        <div className="absolute -right-20 -top-20 size-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 size-60 rounded-full bg-purple-300/10 blur-3xl" />
-
-        {/* Pattern overlay */}
-        <div className="absolute inset-0 opacity-10">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px)`
-            }}
-          />
-        </div>
-      </div>
+        {/* Decorative elements - removed purple orbs */}
+      </Card>
 
       {/* Stats Grid - Following the metric card pattern from the guide */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -358,7 +364,7 @@ async function DashboardContent() {
               <Card className="group h-full cursor-pointer border-purple-100/20 bg-white/50 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:border-purple-300/40 hover:shadow-[0_8px_30px_rgba(147,51,234,0.15)]">
                 <CardHeader>
                   <div className="flex items-start gap-4">
-                    <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-100 to-purple-50 transition-colors group-hover:from-purple-200 group-hover:to-purple-100">
+                    <div className="flex size-12 items-center justify-center rounded-2xl bg-gray-50 transition-colors group-hover:bg-gray-100">
                       <action.icon className="size-6 text-purple-600" />
                     </div>
                     <div className="flex-1 space-y-1">
@@ -382,6 +388,73 @@ async function DashboardContent() {
           ))}
         </div>
       </div>
+
+      {/* Project Stats Grid */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="group cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+          <CardContent className="flex items-center justify-between p-6">
+            <div>
+              <p className="mb-1 text-sm font-medium text-gray-500">
+                Total Projects
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="font-instrument text-3xl font-bold text-purple-600">
+                  12
+                </span>
+                <span className="text-sm font-medium text-green-600">
+                  +2.5%
+                </span>
+              </div>
+            </div>
+            <div className="flex size-10 items-center justify-center rounded-xl border border-purple-600 bg-white shadow-sm">
+              <FolderOpen className="size-5 text-purple-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card className="relative overflow-hidden border-gray-200 bg-white">
+          <div className="absolute right-0 top-0 size-40 bg-purple-50/30 blur-3xl" />
+          <CardHeader className="relative">
+            <CardTitle className="text-2xl font-bold text-black">
+              Recent Activity
+            </CardTitle>
+            <CardDescription className="text-gray-600">
+              Your latest updates and notifications
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="relative space-y-4">
+            {recentActivities.map((activity, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-start gap-4 rounded-lg p-4 transition-colors hover:bg-gray-50"
+              >
+                <div className="mt-0.5">
+                  <div className="size-2 animate-pulse rounded-full bg-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="mb-1 font-medium text-black">
+                    {activity.title}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {activity.description}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-400">{activity.time}</p>
+                </div>
+              </motion.div>
+            ))}
+          </CardContent>
+          <CardFooter>
+            <Button variant="ghost" className="w-full">
+              View all activity
+              <ArrowRight className="ml-2 size-4" />
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   )
 }
@@ -397,7 +470,7 @@ export default async function DashboardPage() {
 function DashboardSkeleton() {
   return (
     <div className="animate-pulse space-y-8">
-      <div className="h-48 rounded-3xl bg-purple-100" />
+      <div className="h-48 rounded-3xl bg-gray-100" />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="h-40 rounded-2xl bg-gray-100" />

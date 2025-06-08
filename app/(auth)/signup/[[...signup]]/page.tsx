@@ -33,7 +33,8 @@ import {
   Lock,
   User,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
@@ -155,12 +156,9 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 via-white to-purple-50/30 p-4">
-      {/* Background decorative elements */}
-      <div className="fixed inset-0 overflow-hidden">
-        <div className="absolute -right-40 -top-40 size-80 rounded-full bg-purple-200/20 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 size-80 rounded-full bg-purple-300/20 blur-3xl" />
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-white p-4">
+      {/* Background decorations - removed purple orbs */}
+      <div className="absolute inset-0" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -175,14 +173,12 @@ export default function SignupPage() {
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-purple-400 shadow-[0_10px_40px_rgba(147,51,234,0.3)]"
+                className="flex size-20 items-center justify-center rounded-2xl border-2 border-purple-600 bg-white shadow-lg"
               >
-                <span className="font-instrument text-3xl font-bold text-white">
-                  FB
-                </span>
+                <Sparkles className="size-8 text-purple-600" />
               </motion.div>
             </div>
-            <CardTitle className="font-instrument bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-3xl font-bold text-transparent">
+            <CardTitle className="font-instrument text-3xl font-bold text-purple-600">
               Create your account
             </CardTitle>
             <CardDescription className="text-muted-foreground text-base">
@@ -337,7 +333,7 @@ export default function SignupPage() {
             <Button
               variant="outline"
               size="lg"
-              className="h-11 w-full border-purple-200/30 bg-white/50 hover:border-purple-300/50 hover:bg-purple-50/50"
+              className="h-11 w-full border-gray-200 bg-white hover:border-purple-300 hover:bg-gray-50"
               onClick={handleGoogleSignup}
               disabled={loading || loadingGoogle}
             >
@@ -370,6 +366,13 @@ export default function SignupPage() {
                 </>
               )}
             </Button>
+
+            {/* Loading indicator */}
+            {loading && (
+              <div className="flex justify-center">
+                <div className="size-2 animate-pulse rounded-full bg-purple-600" />
+              </div>
+            )}
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-4 border-t border-purple-100/20 pt-6 text-center">

@@ -1,29 +1,18 @@
 # Firebase Boilerplate
 
-A modern, production-ready SaaS boilerplate built with Next.js and Firebase.
+A modern, production-ready Next.js boilerplate with Firebase integration, authentication, payments, and more.
 
-## 🚀 Features
+## Features
 
-- **Authentication**: Firebase Auth with Email/Password and Google Sign-in
-- **Database**: Firebase Firestore with real-time capabilities
-- **File Storage**: Firebase Storage for user uploads
-- **Payments**: Stripe integration for subscriptions
-- **Analytics**: PostHog for user analytics
-- **UI Components**: Beautiful components with Shadcn UI
-- **Dark Mode**: Built-in dark mode support
+- **Authentication**: Firebase Auth with email/password and Google OAuth
+- **Database**: Cloud Firestore with type-safe collections
+- **Storage**: Firebase Storage for file uploads
+- **Payments**: Stripe integration with webhooks
+- **Styling**: Tailwind CSS + Shadcn UI components
 - **Type Safety**: Full TypeScript support
-- **Server Actions**: Next.js server actions for data mutations
-- **SEO Optimized**: Meta tags and structured data ready
+- **Developer Experience**: Hot reload, ESLint, Prettier
 
-## 🛠️ Tech Stack
-
-- **Frontend**: Next.js 15, Tailwind CSS, Shadcn UI, Framer Motion
-- **Backend**: Firebase (Auth, Firestore, Storage)
-- **Payments**: Stripe
-- **Analytics**: PostHog
-- **Deployment**: Vercel
-
-## 📦 Getting Started
+## Quick Start
 
 ### Prerequisites
 
@@ -60,7 +49,7 @@ A modern, production-ready SaaS boilerplate built with Next.js and Firebase.
    npm run dev
    ```
 
-## 🔥 Firebase Setup
+## Firebase Setup
 
 ### Quick Setup
 
@@ -91,7 +80,7 @@ A modern, production-ready SaaS boilerplate built with Next.js and Firebase.
    - Enable Cloud Storage
    - Deploy security rules: `firebase deploy --only storage:rules`
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ├── actions/          # Server actions
@@ -104,7 +93,7 @@ A modern, production-ready SaaS boilerplate built with Next.js and Firebase.
 └── public/          # Static assets
 ```
 
-## 🚀 Deployment
+## Deployment
 
 ### Deploy to Vercel
 
@@ -121,7 +110,7 @@ A modern, production-ready SaaS boilerplate built with Next.js and Firebase.
 3. Add environment variables
 4. Deploy
 
-## 🔧 Available Scripts
+## Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
@@ -130,7 +119,7 @@ A modern, production-ready SaaS boilerplate built with Next.js and Firebase.
 - `npm run firebase:setup` - Firebase setup wizard
 - `firebase deploy` - Deploy Firebase rules
 
-## 📝 Environment Variables
+## Environment Variables
 
 ```bash
 # Firebase
@@ -154,15 +143,15 @@ NEXT_PUBLIC_POSTHOG_KEY=
 NEXT_PUBLIC_POSTHOG_HOST=
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](license) file for details.
 
-## 🔗 Links
+## Links
 
 - [Documentation](docs/)
 - [Firebase Console](https://console.firebase.google.com)
