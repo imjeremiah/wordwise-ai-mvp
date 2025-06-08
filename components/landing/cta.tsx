@@ -101,7 +101,7 @@ export async function CTASection() {
 
           {/* CTA Buttons - matching hero style */}
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link href="/#consultation-form">
+            <Link href="/contact">
               <Button
                 size="lg"
                 className="shadow-purple-lg hover-lift group bg-white px-8 py-6 text-lg font-medium text-purple-600 shadow-xl hover:bg-gray-100 hover:shadow-2xl"

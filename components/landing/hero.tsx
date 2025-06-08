@@ -128,7 +128,7 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
           >
-            <Link href="#consultation-form" onClick={handleGetStartedClick}>
+            <Link href="/contact" onClick={handleGetStartedClick}>
               <Button
                 variant="gradient"
                 size="lg"
