@@ -28,7 +28,7 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Mail, Lock, AlertCircle } from "lucide-react"
+import { Loader2, Mail, Lock, AlertCircle, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function LoginPage() {
@@ -124,47 +124,76 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="to-background flex min-h-screen items-center justify-center bg-gradient-to-b from-purple-50/50 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 via-white to-purple-50/30 p-4">
+      {/* Background decorative elements */}
+      <div className="fixed inset-0 overflow-hidden">
+        <div className="absolute -right-40 -top-40 size-80 rounded-full bg-purple-200/20 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 size-80 rounded-full bg-purple-300/20 blur-3xl" />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md"
+        className="relative w-full max-w-md"
       >
-        <Card className="bg-white/80 shadow-xl shadow-purple-500/10 backdrop-blur-sm">
-          <CardHeader className="space-y-1 text-center">
-            <div className="mb-4 flex justify-center">
-              <div className="flex size-16 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-400 shadow-lg shadow-purple-500/30">
-                <span className="text-2xl font-bold text-white">FB</span>
-              </div>
+        <Card className="relative border border-purple-100/20 bg-white/50 shadow-[0_8px_30px_rgba(147,51,234,0.12)] backdrop-blur-sm">
+          <CardHeader className="space-y-1 pb-2 text-center">
+            <div className="mb-6 flex justify-center">
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-purple-400 shadow-[0_10px_40px_rgba(147,51,234,0.3)]"
+              >
+                <span className="font-instrument text-3xl font-bold text-white">
+                  FB
+                </span>
+              </motion.div>
             </div>
-            <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Sign in to your account to continue
+            <CardTitle className="font-instrument bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-3xl font-bold text-transparent">
+              Welcome back
+            </CardTitle>
+            <CardDescription className="text-muted-foreground text-base">
+              Sign in to continue to your dashboard
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 px-6 pb-6">
             {error && (
-              <Alert variant="destructive" className="border-red-200 bg-red-50">
-                <AlertCircle className="size-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Alert
+                  variant="destructive"
+                  className="border-red-200/50 bg-red-50/50 backdrop-blur-sm"
+                >
+                  <AlertCircle className="size-4" />
+                  <AlertDescription className="text-sm">
+                    {error}
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
             )}
 
-            <form onSubmit={handleEmailLogin} className="space-y-4">
+            <form onSubmit={handleEmailLogin} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
+                <Label
+                  htmlFor="email"
+                  className="text-foreground/90 text-sm font-medium"
+                >
                   Email address
                 </Label>
                 <div className="relative">
-                  <Mail className="text-muted-foreground absolute left-3 top-3 size-4" />
+                  <Mail className="text-muted-foreground/50 absolute left-3.5 top-1/2 size-4 -translate-y-1/2" />
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="h-11 pl-10"
                     placeholder="name@example.com"
                     required
                     disabled={loading || loadingGoogle}
@@ -173,17 +202,28 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">
-                  Password
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="password"
+                    className="text-foreground/90 text-sm font-medium"
+                  >
+                    Password
+                  </Label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm font-medium text-purple-600 transition-colors hover:text-purple-700"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <div className="relative">
-                  <Lock className="text-muted-foreground absolute left-3 top-3 size-4" />
+                  <Lock className="text-muted-foreground/50 absolute left-3.5 top-1/2 size-4 -translate-y-1/2" />
                   <Input
                     id="password"
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="pl-10"
+                    className="h-11 pl-10"
                     placeholder="Enter your password"
                     required
                     disabled={loading || loadingGoogle}
@@ -204,17 +244,20 @@ export default function LoginPage() {
                     Signing in...
                   </>
                 ) : (
-                  "Sign in with Email"
+                  <span className="flex items-center gap-2">
+                    Sign in to dashboard
+                    <ArrowRight className="size-4" />
+                  </span>
                 )}
               </Button>
             </form>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="border-border/40 w-full border-t" />
+                <span className="w-full border-t border-purple-100/50" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="text-muted-foreground bg-white/80 px-2">
+                <span className="text-muted-foreground rounded-full bg-white/50 px-3 py-1 backdrop-blur-sm">
                   Or continue with
                 </span>
               </div>
@@ -224,7 +267,7 @@ export default function LoginPage() {
               type="button"
               variant="outline"
               size="lg"
-              className="w-full"
+              className="h-11 w-full border-purple-200/30 bg-white/50 hover:border-purple-300/50 hover:bg-purple-50/50"
               onClick={handleGoogleLogin}
               disabled={loading || loadingGoogle}
             >
@@ -235,7 +278,7 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  <svg className="mr-2 size-4" viewBox="0 0 24 24">
+                  <svg className="mr-2 size-5" viewBox="0 0 24 24">
                     <path
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                       fill="#4285F4"
@@ -253,24 +296,39 @@ export default function LoginPage() {
                       fill="#EA4335"
                     />
                   </svg>
-                  Sign in with Google
+                  Continue with Google
                 </>
               )}
             </Button>
           </CardContent>
 
-          <CardFooter className="flex flex-col space-y-4 text-center">
+          <CardFooter className="flex flex-col space-y-4 border-t border-purple-100/20 pt-6 text-center">
             <div className="text-muted-foreground text-sm">
               Don't have an account?{" "}
               <Link
                 href="/signup"
-                className="font-medium text-purple-600 hover:text-purple-700 hover:underline"
+                className="font-medium text-purple-600 underline-offset-4 transition-colors hover:text-purple-700 hover:underline"
               >
-                Create account
+                Create free account
               </Link>
             </div>
           </CardFooter>
         </Card>
+
+        {/* Trust badges */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-8 flex justify-center"
+        >
+          <div className="inline-flex items-center gap-2 rounded-full border border-purple-200/30 bg-white/50 px-4 py-2 backdrop-blur-sm">
+            <div className="size-2 animate-pulse rounded-full bg-gradient-to-r from-purple-600 to-purple-400" />
+            <span className="text-muted-foreground text-xs font-medium">
+              Trusted by 10,000+ developers
+            </span>
+          </div>
+        </motion.div>
       </motion.div>
     </div>
   )
