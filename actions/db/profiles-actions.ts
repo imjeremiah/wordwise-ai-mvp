@@ -15,6 +15,7 @@ export async function createProfileAction(
   data: Omit<FirebaseProfile, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<ActionState<FirebaseProfile>> {
   console.log('[Profiles Action] Creating profile for user:', data.userId)
+  console.log('[Profiles Action] Profile data:', JSON.stringify(data, null, 2))
   
   if (!db) {
     console.error('[Profiles Action] Database not initialized')
@@ -22,17 +23,41 @@ export async function createProfileAction(
   }
   
   try {
-    const profileData = {
+    const profileDataToCreate = {
       ...data,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp()
     }
     
-    const docRef = await db.collection(collections.profiles).add(profileData)
+    console.log('[Profiles Action] Attempting to add document to collection:', collections.profiles)
+    const docRef = await db.collection(collections.profiles).add(profileDataToCreate)
     console.log('[Profiles Action] Profile created with ID:', docRef.id)
     
+    // Wait a bit for server timestamps to resolve
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
     const newProfile = await docRef.get()
-    const profileWithId = { id: docRef.id, ...newProfile.data() } as FirebaseProfile
+    const retrievedProfileData = newProfile.data()
+    
+    // Handle case where data might be null
+    if (!retrievedProfileData) {
+      console.error('[Profiles Action] Profile data is null after creation')
+      // Return with the data we know, using current date for timestamps
+      const profileWithId = { 
+        id: docRef.id, 
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      } as FirebaseProfile
+      
+      return {
+        isSuccess: true,
+        message: "Profile created successfully",
+        data: profileWithId
+      }
+    }
+    
+    const profileWithId = { id: docRef.id, ...retrievedProfileData } as FirebaseProfile
     
     console.log('[Profiles Action] Profile created successfully')
     return {
@@ -41,10 +66,13 @@ export async function createProfileAction(
       data: profileWithId
     }
   } catch (error: any) {
-    console.error("[Profiles Action] Error creating profile:", error)
+    console.error("[Profiles Action] Error creating profile - Full error object:", error)
+    console.error("[Profiles Action] Error message:", error?.message)
+    console.error("[Profiles Action] Error code:", error?.code)
+    console.error("[Profiles Action] Error stack:", error?.stack)
     
     // Check if it's a Firestore not enabled error
-    if (error?.code === 5 || error?.message?.includes('NOT_FOUND')) {
+    if (error?.code === 5 || error?.code === 'NOT_FOUND' || error?.message?.includes('NOT_FOUND')) {
       console.error('[Profiles Action] Firestore is not enabled in Firebase project')
       return { 
         isSuccess: false, 
@@ -52,7 +80,16 @@ export async function createProfileAction(
       }
     }
     
-    return { isSuccess: false, message: "Failed to create profile" }
+    // Check if it's a permission error
+    if (error?.code === 7 || error?.code === 'PERMISSION_DENIED') {
+      console.error('[Profiles Action] Permission denied - check Firestore rules')
+      return { 
+        isSuccess: false, 
+        message: "Permission denied. Please check your Firestore security rules." 
+      }
+    }
+    
+    return { isSuccess: false, message: `Failed to create profile: ${error?.message || 'Unknown error'}` }
   }
 }
 
