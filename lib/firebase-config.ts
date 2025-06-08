@@ -19,6 +19,14 @@ if (!getApps().length) {
     // Check if we have the service account file
     const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH
 
+    console.log("[Firebase Config] Environment check:")
+    console.log("[Firebase Config] - NODE_ENV:", process.env.NODE_ENV)
+    console.log(
+      "[Firebase Config] - FIREBASE_SERVICE_ACCOUNT_PATH:",
+      serviceAccountPath
+    )
+    console.log("[Firebase Config] - Current working directory:", process.cwd())
+
     if (!serviceAccountPath) {
       console.log(
         "[Firebase Config] No FIREBASE_SERVICE_ACCOUNT_PATH provided, skipping Firebase Admin initialization"

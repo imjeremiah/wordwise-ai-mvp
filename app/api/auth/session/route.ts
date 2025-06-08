@@ -10,19 +10,37 @@ export async function POST(request: NextRequest) {
   try {
     const { idToken, isNewUser } = await request.json()
     console.log("[Session API] Processing session for new user:", !!isNewUser)
+    console.log("[Session API] ID token length:", idToken?.length)
+
+    // Extract first few chars of token for debugging (don't log full token)
+    console.log(
+      "[Session API] ID token preview:",
+      idToken?.substring(0, 20) + "..."
+    )
 
     // Check if adminAuth is available
     if (!adminAuth) {
       console.error("[Session API] Firebase Admin Auth not initialized")
+      console.log(
+        "[Session API] Checking FIREBASE_SERVICE_ACCOUNT_PATH:",
+        process.env.FIREBASE_SERVICE_ACCOUNT_PATH
+      )
       return NextResponse.json(
-        { error: "Firebase Admin Auth not configured" },
+        {
+          error: "Firebase Admin Auth not configured. Please check server logs."
+        },
         { status: 503 }
       )
     }
 
+    console.log("[Session API] Firebase Admin Auth is available")
+    console.log("[Session API] Attempting to verify ID token...")
+
     // Verify the ID token
     const decodedToken = await adminAuth.verifyIdToken(idToken)
-    console.log("[Session API] Token verified for user:", decodedToken.uid)
+    console.log("[Session API] Token verified successfully!")
+    console.log("[Session API] User UID:", decodedToken.uid)
+    console.log("[Session API] User email:", decodedToken.email)
 
     // Create session cookie
     const sessionCookie = await createSessionCookie(idToken)
