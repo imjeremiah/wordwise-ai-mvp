@@ -174,6 +174,48 @@ export function EditorContent({ userId }: EditorContentProps) {
     }
   }, [document?.id, title, content, wordCount, isSaving, toast])
 
+  // Autosave functionality
+  const autosave = useCallback(async () => {
+    if (!document?.id || !hasUnsavedChanges) return
+
+    console.log("[EditorContent] Autosaving document:", document.id)
+
+    try {
+      const result = await updateDocumentAction(document.id, {
+        title,
+        content,
+        wordCount
+      })
+
+      if (result.isSuccess) {
+        console.log("[EditorContent] Autosave successful")
+        setLastSaved(new Date())
+        setHasUnsavedChanges(false)
+      } else {
+        console.error("[EditorContent] Autosave failed:", result.message)
+      }
+    } catch (error) {
+      console.error("[EditorContent] Autosave error:", error)
+    }
+  }, [document?.id, title, content, wordCount, hasUnsavedChanges])
+
+  // Debounced autosave effect
+  useEffect(() => {
+    if (!hasUnsavedChanges || !document?.id) return
+
+    console.log("[EditorContent] Scheduling autosave in 1 second")
+
+    // Autosave after 1 second of inactivity
+    const timeoutId = setTimeout(() => {
+      autosave()
+    }, 1000)
+
+    return () => {
+      console.log("[EditorContent] Clearing autosave timeout")
+      clearTimeout(timeoutId)
+    }
+  }, [hasUnsavedChanges, autosave])
+
   // Handle content change from Lexical editor
   const handleContentChange = useCallback(
     (newContent: string, newWordCount: number) => {
@@ -246,17 +288,22 @@ export function EditorContent({ userId }: EditorContentProps) {
             </div>
 
             <div className="flex items-center gap-3">
-              {hasUnsavedChanges && (
-                <span className="text-sm font-medium text-amber-600">
-                  Unsaved changes
-                </span>
-              )}
+              {/* Live word count */}
+              <div className="flex items-center gap-1 text-sm text-gray-600">
+                <FileText className="size-4" />
+                <span>{wordCount} words</span>
+              </div>
 
-              {lastSaved && !hasUnsavedChanges && (
-                <span className="text-sm text-gray-500">
-                  Saved {lastSaved.toLocaleTimeString()}
+              {/* Autosave status */}
+              {hasUnsavedChanges ? (
+                <span className="text-sm font-medium text-amber-600">
+                  Autosaving...
                 </span>
-              )}
+              ) : lastSaved ? (
+                <span className="text-sm text-green-600">
+                  ✓ Saved {lastSaved.toLocaleTimeString()}
+                </span>
+              ) : null}
 
               <Button
                 onClick={handleManualSave}
@@ -349,27 +396,19 @@ export function EditorContent({ userId }: EditorContentProps) {
               </CardContent>
             </Card>
 
-            {/* Writing Suggestions */}
-            <Card className="border-gray-200 bg-white shadow-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                  <Zap className="size-4 text-green-600" />
-                  Writing Suggestions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="py-8 text-center">
-                  <div className="mb-3">
-                    <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-gray-100">
-                      <BookOpen className="size-6 text-gray-400" />
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    Start writing to see suggestions
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            {/* AI Writing Suggestions */}
+            <SuggestionPanel
+              content={content}
+              userId={userId}
+              documentId={document?.id}
+              onSuggestionApplied={suggestion => {
+                console.log(
+                  "[EditorContent] Suggestion applied:",
+                  suggestion.title
+                )
+                // Could implement automatic text replacement here
+              }}
+            />
 
             {/* Quick Actions */}
             <Card className="border-gray-200 bg-white shadow-sm">

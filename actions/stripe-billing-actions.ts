@@ -78,7 +78,7 @@ export async function getCustomerInvoicesAction(
   console.log("[getCustomerInvoicesAction] Fetching invoices for user:", userId)
   
   try {
-    const profileResult = await getProfileByUserIdAction(userId)
+    const profileResult = await getProfileByUserIdAction({ userId })
     
     if (!profileResult.isSuccess || !profileResult.data.stripeCustomerId) {
       return {
@@ -116,7 +116,7 @@ export async function getUpcomingInvoiceAction(
   console.log("[getUpcomingInvoiceAction] Fetching upcoming invoice for user:", userId)
   
   try {
-    const profileResult = await getProfileByUserIdAction(userId)
+    const profileResult = await getProfileByUserIdAction({ userId })
     
     if (!profileResult.isSuccess || !profileResult.data.stripeCustomerId) {
       return {
@@ -209,7 +209,7 @@ export async function getPaymentHistoryAction(
   console.log("[getPaymentHistoryAction] Fetching payment history for user:", userId)
   
   try {
-    const profileResult = await getProfileByUserIdAction(userId)
+    const profileResult = await getProfileByUserIdAction({ userId })
     
     if (!profileResult.isSuccess || !profileResult.data.stripeCustomerId) {
       return {

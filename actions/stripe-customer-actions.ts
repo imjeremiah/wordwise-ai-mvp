@@ -15,7 +15,7 @@ export async function createStripeCustomerAction(
   
   try {
     // Check if user already has a Stripe customer ID
-    const profileResult = await getProfileByUserIdAction(userId)
+    const profileResult = await getProfileByUserIdAction({ userId })
     
     if (profileResult.isSuccess && profileResult.data.stripeCustomerId) {
       console.log("[createStripeCustomerAction] User already has Stripe customer ID")
@@ -74,7 +74,7 @@ export async function createCheckoutSessionAction(
   
   try {
     // Get user profile to check for existing customer
-    const profileResult = await getProfileByUserIdAction(userId)
+    const profileResult = await getProfileByUserIdAction({ userId })
     
     if (!profileResult.isSuccess) {
       return {
@@ -138,7 +138,7 @@ export async function createCustomerPortalSessionAction(
   
   try {
     // Get user profile to get Stripe customer ID
-    const profileResult = await getProfileByUserIdAction(userId)
+    const profileResult = await getProfileByUserIdAction({ userId })
     
     if (!profileResult.isSuccess || !profileResult.data.stripeCustomerId) {
       return {
@@ -175,7 +175,7 @@ export async function getCustomerPaymentMethodsAction(
   console.log("[getCustomerPaymentMethodsAction] Fetching payment methods for user:", userId)
   
   try {
-    const profileResult = await getProfileByUserIdAction(userId)
+    const profileResult = await getProfileByUserIdAction({ userId })
     
     if (!profileResult.isSuccess || !profileResult.data.stripeCustomerId) {
       return {

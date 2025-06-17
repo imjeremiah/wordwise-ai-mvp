@@ -155,7 +155,7 @@ export async function getUserDocumentsAction(
     console.error("[getUserDocumentsAction] Error details:", {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
-      ownerUID
+      ownerUID: payload.ownerUID
     })
     return { isSuccess: false, message: "Failed to fetch documents - Please try again" }
   }

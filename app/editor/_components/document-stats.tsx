@@ -23,6 +23,8 @@ export function DocumentStats({
   // Calculate derived stats
   const calculatedCharCount = characterCount || wordCount * 5 // Rough estimate
   const calculatedReadingTime = readingTime || Math.ceil(wordCount / 200) // 200 words per minute
+
+  // Use provided readability score or calculate a basic estimate
   const calculatedReadability =
     readabilityScore || Math.max(1, Math.min(20, 8 + wordCount / 100))
 

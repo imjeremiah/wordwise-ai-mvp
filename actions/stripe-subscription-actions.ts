@@ -12,7 +12,7 @@ export async function getActiveSubscriptionAction(
   console.log("[getActiveSubscriptionAction] Fetching active subscription for user:", userId)
   
   try {
-    const profileResult = await getProfileByUserIdAction(userId)
+    const profileResult = await getProfileByUserIdAction({ userId })
     
     if (!profileResult.isSuccess || !profileResult.data.stripeCustomerId) {
       console.log("[getActiveSubscriptionAction] No Stripe customer found")
@@ -54,7 +54,7 @@ export async function getAllSubscriptionsAction(
   console.log("[getAllSubscriptionsAction] Fetching all subscriptions for user:", userId)
   
   try {
-    const profileResult = await getProfileByUserIdAction(userId)
+    const profileResult = await getProfileByUserIdAction({ userId })
     
     if (!profileResult.isSuccess || !profileResult.data.stripeCustomerId) {
       return {

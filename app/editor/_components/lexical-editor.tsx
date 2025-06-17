@@ -75,6 +75,7 @@ export function LexicalEditor({
                   <div className="lexical-placeholder">{placeholder}</div>
                 }
                 aria-label="Document editor"
+                aria-placeholder={placeholder}
                 spellCheck={true}
               />
             }

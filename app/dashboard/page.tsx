@@ -16,7 +16,7 @@ import {
   createProfileAction
 } from "@/actions/db/profiles-actions"
 import { DocumentsDashboard } from "./_components/documents-dashboard"
-import { FirestoreSetupNotice } from "@/components/utilities/firestore-setup-notice"
+import FirestoreSetupNotice from "@/components/utilities/firestore-setup-notice"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"

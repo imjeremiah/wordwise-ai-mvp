@@ -23,7 +23,7 @@ export default async function PricingPage() {
 
   let stripeCustomerId = null
   if (userId) {
-    const profile = await getProfileByUserIdAction(userId)
+    const profile = await getProfileByUserIdAction({ userId })
     if (profile.isSuccess && profile.data) {
       stripeCustomerId = profile.data.stripeCustomerId || null
     }

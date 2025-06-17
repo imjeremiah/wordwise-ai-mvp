@@ -1,104 +1,240 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { useToast } from "@/hooks/use-toast"
 import {
   Lightbulb,
   CheckCircle,
   X,
   AlertTriangle,
   BookOpen,
-  Zap
+  Zap,
+  Clock,
+  Wifi,
+  WifiOff
 } from "lucide-react"
+import {
+  getAISuggestionsAction,
+  logSuggestionInteractionAction,
+  type WritingSuggestion,
+  type SuggestionResponse
+} from "@/actions/ai-suggestions-actions"
 
 interface SuggestionPanelProps {
   content: string
   userId: string
+  documentId?: string
+  onSuggestionApplied?: (suggestion: WritingSuggestion) => void
 }
 
-interface WritingSuggestion {
-  id: string
-  type: "grammar" | "style" | "clarity" | "tone"
-  severity: "low" | "medium" | "high"
-  title: string
-  description: string
-  suggestion: string
-  position?: {
-    start: number
-    end: number
-  }
-}
-
-export function SuggestionPanel({ content, userId }: SuggestionPanelProps) {
+export function SuggestionPanel({
+  content,
+  userId,
+  documentId,
+  onSuggestionApplied
+}: SuggestionPanelProps) {
   const [suggestions, setSuggestions] = useState<WritingSuggestion[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedSuggestion, setSelectedSuggestion] = useState<string | null>(
     null
   )
+  const [lastAnalyzedContent, setLastAnalyzedContent] = useState("")
+  const [processingTime, setProcessingTime] = useState<number | null>(null)
+  const [isCached, setIsCached] = useState(false)
+  const [readabilityScore, setReadabilityScore] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
 
   console.log("[SuggestionPanel] Component mounted for user:", userId)
+  console.log("[SuggestionPanel] Document ID:", documentId)
 
-  // Mock suggestions for now (will be replaced with AI in Phase 4)
+  // Debounced AI analysis function
+  const analyzeContent = useCallback(
+    async (textContent: string) => {
+      if (!textContent || textContent.length < 10) {
+        console.log("[SuggestionPanel] Text too short, clearing suggestions")
+        setSuggestions([])
+        setError(null)
+        setProcessingTime(null)
+        setIsCached(false)
+        setReadabilityScore(null)
+        return
+      }
+
+      if (textContent === lastAnalyzedContent) {
+        console.log("[SuggestionPanel] Content unchanged, skipping analysis")
+        return
+      }
+
+      console.log(
+        "[SuggestionPanel] Starting AI analysis for content length:",
+        textContent.length
+      )
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const result = await getAISuggestionsAction(textContent, documentId)
+
+        if (result.isSuccess && result.data) {
+          console.log("[SuggestionPanel] AI analysis successful")
+          console.log(
+            "[SuggestionPanel] Found",
+            result.data.suggestions.length,
+            "suggestions"
+          )
+          console.log(
+            "[SuggestionPanel] Processing time:",
+            result.data.processingTime + "ms"
+          )
+          console.log("[SuggestionPanel] Cached:", result.data.cached)
+          console.log(
+            "[SuggestionPanel] Readability score:",
+            result.data.readabilityScore
+          )
+
+          setSuggestions(result.data.suggestions)
+          setProcessingTime(result.data.processingTime)
+          setIsCached(result.data.cached)
+          setReadabilityScore(result.data.readabilityScore)
+          setLastAnalyzedContent(textContent)
+          setError(null)
+
+          if (result.data.suggestions.length === 0) {
+            toast({
+              title: "Analysis Complete",
+              description: "Great job! No suggestions needed for this text."
+            })
+          }
+        } else {
+          console.error("[SuggestionPanel] AI analysis failed:", result.message)
+          setError(result.message)
+          setSuggestions([])
+
+          toast({
+            variant: "destructive",
+            title: "Analysis Failed",
+            description: result.message
+          })
+        }
+      } catch (error) {
+        console.error(
+          "[SuggestionPanel] Unexpected error during analysis:",
+          error
+        )
+        setError("An unexpected error occurred during analysis")
+        setSuggestions([])
+
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to analyze text. Please try again."
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [lastAnalyzedContent, documentId, toast]
+  )
+
+  // Debounced effect for content analysis
   useEffect(() => {
     if (!content || content.length < 10) {
       setSuggestions([])
+      setError(null)
       return
     }
 
-    console.log("[SuggestionPanel] Analyzing content length:", content.length)
+    console.log("[SuggestionPanel] Content changed, scheduling analysis")
 
-    // Generate mock suggestions based on content
-    const mockSuggestions: WritingSuggestion[] = []
+    // Debounce AI requests by 1 second
+    const timeoutId = setTimeout(() => {
+      analyzeContent(content)
+    }, 1000)
 
-    // Check for common issues
-    if (content.includes("very")) {
-      mockSuggestions.push({
-        id: "1",
-        type: "style",
-        severity: "medium",
-        title: "Strengthen your language",
-        description: "Consider replacing 'very' with a stronger word",
-        suggestion: "Use more specific adjectives instead of 'very + adjective'"
-      })
+    return () => {
+      console.log("[SuggestionPanel] Clearing analysis timeout")
+      clearTimeout(timeoutId)
     }
+  }, [content, analyzeContent])
 
-    if (content.split(".").length > 3) {
-      mockSuggestions.push({
-        id: "2",
-        type: "clarity",
-        severity: "low",
-        title: "Sentence variety",
-        description: "Consider varying your sentence structure",
-        suggestion: "Mix short and long sentences for better flow"
-      })
-    }
-
-    if (content.length > 100 && !content.includes(",")) {
-      mockSuggestions.push({
-        id: "3",
-        type: "grammar",
-        severity: "high",
-        title: "Consider punctuation",
-        description: "Long sentences may benefit from commas",
-        suggestion: "Break up complex ideas with proper punctuation"
-      })
-    }
-
-    setSuggestions(mockSuggestions)
-  }, [content])
-
-  const handleAcceptSuggestion = (suggestionId: string) => {
+  const handleAcceptSuggestion = async (suggestionId: string) => {
     console.log("[SuggestionPanel] Accepting suggestion:", suggestionId)
-    setSuggestions(prev => prev.filter(s => s.id !== suggestionId))
-    // TODO: Apply suggestion to editor content
+
+    const suggestion = suggestions.find(s => s.id === suggestionId)
+    if (!suggestion) {
+      console.error("[SuggestionPanel] Suggestion not found:", suggestionId)
+      return
+    }
+
+    try {
+      // Log the acceptance
+      await logSuggestionInteractionAction("accept", suggestionId, {
+        suggestionType: suggestion.type,
+        severity: suggestion.severity,
+        documentId,
+        textLength: content.length
+      })
+
+      // Apply suggestion to editor if callback provided
+      if (onSuggestionApplied) {
+        onSuggestionApplied(suggestion)
+      }
+
+      // Remove suggestion from list
+      setSuggestions(prev => prev.filter(s => s.id !== suggestionId))
+
+      toast({
+        title: "Suggestion Applied",
+        description: suggestion.title
+      })
+
+      console.log(
+        "[SuggestionPanel] Suggestion accepted and logged successfully"
+      )
+    } catch (error) {
+      console.error("[SuggestionPanel] Error accepting suggestion:", error)
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to apply suggestion"
+      })
+    }
   }
 
-  const handleDismissSuggestion = (suggestionId: string) => {
+  const handleDismissSuggestion = async (suggestionId: string) => {
     console.log("[SuggestionPanel] Dismissing suggestion:", suggestionId)
-    setSuggestions(prev => prev.filter(s => s.id !== suggestionId))
+
+    const suggestion = suggestions.find(s => s.id === suggestionId)
+    if (!suggestion) {
+      console.error("[SuggestionPanel] Suggestion not found:", suggestionId)
+      return
+    }
+
+    try {
+      // Log the dismissal
+      await logSuggestionInteractionAction("dismiss", suggestionId, {
+        suggestionType: suggestion.type,
+        severity: suggestion.severity,
+        documentId,
+        textLength: content.length
+      })
+
+      // Remove suggestion from list
+      setSuggestions(prev => prev.filter(s => s.id !== suggestionId))
+
+      console.log(
+        "[SuggestionPanel] Suggestion dismissed and logged successfully"
+      )
+    } catch (error) {
+      console.error("[SuggestionPanel] Error dismissing suggestion:", error)
+      // Still remove the suggestion even if logging fails
+      setSuggestions(prev => prev.filter(s => s.id !== suggestionId))
+    }
   }
 
   const getSeverityColor = (severity: WritingSuggestion["severity"]) => {
@@ -134,26 +270,77 @@ export function SuggestionPanel({ content, userId }: SuggestionPanelProps) {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-medium">
           <Lightbulb className="size-4 text-purple-600" />
-          Writing Suggestions
+          AI Writing Assistant
           {suggestions.length > 0 && (
             <Badge variant="secondary" className="ml-2">
               {suggestions.length}
             </Badge>
           )}
+          {isLoading && (
+            <div className="ml-2 size-4 animate-spin rounded-full border-b-2 border-purple-600"></div>
+          )}
         </CardTitle>
+
+        {/* Performance and Cache Status */}
+        {(processingTime !== null || readabilityScore !== null) && (
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            {processingTime !== null && (
+              <div className="flex items-center gap-1">
+                <Clock className="size-3" />
+                <span>
+                  {processingTime < 1000
+                    ? `${processingTime}ms`
+                    : `${(processingTime / 1000).toFixed(1)}s`}
+                </span>
+              </div>
+            )}
+            {isCached && (
+              <div className="flex items-center gap-1 text-green-600">
+                <Wifi className="size-3" />
+                <span>Cached</span>
+              </div>
+            )}
+            {readabilityScore !== null && (
+              <div className="flex items-center gap-1">
+                <BookOpen className="size-3" />
+                <span>Grade {readabilityScore}</span>
+              </div>
+            )}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-3">
-        {isLoading ? (
+        {error ? (
+          <div className="py-6 text-center">
+            <WifiOff className="mx-auto mb-2 size-8 text-red-300" />
+            <p className="mb-2 text-sm text-red-600">{error}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => analyzeContent(content)}
+              disabled={isLoading}
+            >
+              Try Again
+            </Button>
+          </div>
+        ) : isLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="size-6 animate-spin rounded-full border-b-2 border-purple-600"></div>
-            <span className="ml-2 text-sm text-gray-600">Analyzing...</span>
+            <span className="ml-2 text-sm text-gray-600">
+              Analyzing with AI...
+            </span>
           </div>
         ) : suggestions.length === 0 ? (
           <div className="py-8 text-center">
             <Lightbulb className="mx-auto mb-2 size-8 text-gray-300" />
             <p className="text-sm text-gray-500">
-              Start writing to see suggestions
+              {content.length < 10
+                ? "Start writing to see AI suggestions"
+                : "Great writing! No suggestions needed."}
             </p>
+            {content.length >= 10 && (
+              <p className="mt-1 text-xs text-gray-400">AI analysis complete</p>
+            )}
           </div>
         ) : (
           suggestions.map((suggestion, index) => (
