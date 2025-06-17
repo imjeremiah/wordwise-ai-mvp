@@ -8,17 +8,31 @@ import { getAnalytics, isSupported } from "firebase/analytics"
 
 // Firebase configuration - these should be set in your environment variables
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "dummy-api-key",
+  authDomain:
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+    "dummy-project.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "dummy-project",
+  storageBucket:
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+    "dummy-project.appspot.com",
+  messagingSenderId:
+    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "123456789",
+  appId:
+    process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:123456789:web:dummy-app-id"
 }
+
+// Check if we have real Firebase credentials
+const hasRealCredentials = !!(
+  process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+  process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+)
 
 console.log("[Firebase Client] Initializing Firebase with config:", {
   ...firebaseConfig,
-  apiKey: "***" // Hide API key in logs
+  apiKey: "***", // Hide API key in logs
+  hasRealCredentials
 })
 
 // Initialize Firebase
@@ -35,8 +49,8 @@ console.log("[Firebase Client] Firestore service initialized")
 export const storage = getStorage(app)
 console.log("[Firebase Client] Storage service initialized")
 
-// Initialize Analytics (only in browser)
-if (typeof window !== "undefined") {
+// Initialize Analytics (only in browser and with real credentials)
+if (typeof window !== "undefined" && hasRealCredentials) {
   isSupported().then(supported => {
     if (supported) {
       const analytics = getAnalytics(app)
@@ -49,7 +63,7 @@ if (typeof window !== "undefined") {
   })
 }
 
-// Connect to emulators if in development
+// Connect to emulators if in development and using emulators
 if (
   process.env.NODE_ENV === "development" &&
   process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true"
@@ -69,5 +83,8 @@ if (
     console.error("[Firebase Client] Error connecting to emulators:", error)
   }
 }
+
+// Export flag for checking if credentials are available
+export { hasRealCredentials }
 
 export default app

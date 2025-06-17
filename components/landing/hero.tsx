@@ -117,7 +117,7 @@ export const HeroSection = () => {
             >
               <div className="size-2 animate-pulse rounded-full bg-gradient-to-r from-purple-600 to-purple-400" />
               <span className="text-muted-foreground text-sm font-medium">
-                Trusted by 100+ businesses saving millions
+                Trusted by 10,000+ writers and professionals
               </span>
             </motion.div>
 
@@ -128,10 +128,10 @@ export const HeroSection = () => {
               transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
               className="font-instrument mb-10 text-4xl font-bold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl"
             >
-              Build{" "}
+              Write with{" "}
               <span className="relative">
                 <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
-                  custom software
+                  confidence
                 </span>
                 <svg
                   className="absolute -bottom-2 left-0 w-full"
@@ -160,7 +160,7 @@ export const HeroSection = () => {
               </span>{" "}
               <br />
               <span className="text-muted-foreground mt-3 inline-block">
-                you'll own forever
+                using AI-powered assistance
               </span>
             </motion.h1>
 
@@ -171,10 +171,12 @@ export const HeroSection = () => {
               transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
               className="text-muted-foreground mx-auto mb-10 max-w-2xl text-xl leading-relaxed md:text-2xl"
             >
-              Stop paying monthly for generic SaaS. We build exactly what you
-              need in{" "}
-              <span className="text-foreground font-semibold">2 weeks</span>,
-              not 6 months.
+              Transform your writing with intelligent grammar and style
+              suggestions. Write like a{" "}
+              <span className="text-foreground font-semibold">
+                professional
+              </span>{" "}
+              with AI that understands context.
             </motion.p>
 
             {/* Feature pills */}
@@ -185,9 +187,9 @@ export const HeroSection = () => {
               className="mb-10 flex flex-wrap justify-center gap-3"
             >
               {[
-                "No monthly fees ever",
-                "Built by AI experts",
-                "100% satisfaction guarantee"
+                "Real-time grammar checking",
+                "Style & tone suggestions",
+                "Privacy-focused AI"
               ].map((feature, index) => (
                 <div
                   key={feature}

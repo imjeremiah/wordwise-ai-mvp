@@ -23,11 +23,11 @@ export async function Footer() {
               <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-purple-400 shadow-sm">
                 <Code2 className="size-5 text-white" />
               </div>
-              <span className="text-lg font-semibold">DevAgency</span>
+              <span className="text-lg font-semibold">WordWise AI</span>
             </Link>
             <p className="text-muted-foreground text-sm">
-              Stop renting software. Start owning it. We build custom platforms
-              in 2 weeks that you'll own forever.
+              Transform your writing with AI-powered grammar and style
+              suggestions. Write with confidence using intelligent assistance.
             </p>
           </div>
 
@@ -160,7 +160,7 @@ export async function Footer() {
         <div className="mt-12 border-t border-purple-100/20 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-muted-foreground text-sm">
-              © {currentYear} DevAgency. All rights reserved.
+              © {currentYear} WordWise AI. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm">
               <Link

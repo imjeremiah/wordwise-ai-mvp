@@ -1,0 +1,83 @@
+name: WordWise AI CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run type checking
+      run: npm run type-check
+      
+    - name: Run linting
+      run: npm run lint
+      
+    - name: Run Prettier format check
+      run: npm run format:check
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Export static site
+      run: npm run build:export
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts-${{ matrix.node-version }}
+        path: out/
+        retention-days: 7
+        
+    # TODO: Uncomment for Phase 2 when Firebase secrets are added
+    # - name: Deploy to Firebase Hosting
+    #   if: github.ref == 'refs/heads/main' && matrix.node-version == '20.x'
+    #   uses: FirebaseExtended/action-hosting-deploy@v0
+    #   with:
+    #     repoToken: ${{ secrets.GITHUB_TOKEN }}
+    #     firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    #     channelId: live
+    #     projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+        
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    # TODO: Add test command when tests are implemented
+    # - name: Run tests
+    #   run: npm test
+      
+    - name: Test Firebase connection (when credentials available)
+      run: echo "Firebase tests will be added in Phase 2" 

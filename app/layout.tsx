@@ -30,28 +30,30 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "DevAgency - Build Custom Software You'll Own Forever",
+  title: "WordWise AI - Grammar & Style Assistant Powered by AI",
   description:
-    "Stop paying monthly for generic SaaS. We build exactly what you need in 2 weeks, not 6 months. 100% ownership, no monthly fees ever.",
+    "Transform your writing with AI-powered grammar and style suggestions. Professional writing assistant that learns your style and helps you write with confidence.",
   keywords: [
-    "custom software",
-    "ai development",
-    "saas alternative",
-    "software ownership"
+    "grammar checker",
+    "writing assistant",
+    "ai writing",
+    "style guide",
+    "proofreading",
+    "editing tool"
   ],
   openGraph: {
-    title: "DevAgency - Build Custom Software You'll Own Forever",
+    title: "WordWise AI - Grammar & Style Assistant Powered by AI",
     description:
-      "Stop paying monthly for generic SaaS. We build exactly what you need in 2 weeks.",
+      "Transform your writing with AI-powered grammar and style suggestions. Professional writing assistant.",
     type: "website",
     locale: "en_US",
-    siteName: "DevAgency"
+    siteName: "WordWise AI"
   },
   twitter: {
     card: "summary_large_image",
-    title: "DevAgency - Build Custom Software You'll Own Forever",
+    title: "WordWise AI - Grammar & Style Assistant Powered by AI",
     description:
-      "Stop paying monthly for generic SaaS. We build exactly what you need in 2 weeks."
+      "Transform your writing with AI-powered grammar and style suggestions."
   }
 }
 

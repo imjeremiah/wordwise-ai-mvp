@@ -1,162 +1,178 @@
-# Firebase Boilerplate
+# WordWise AI
 
-A modern, production-ready Next.js boilerplate with Firebase integration, authentication, payments, and more.
+**Grammar & Style Assistant Powered by AI**
 
-## Features
+Transform your writing with intelligent grammar and style suggestions. WordWise AI is a professional writing assistant that learns your style and helps you write with confidence.
 
-- **Authentication**: Firebase Auth with email/password and Google OAuth
-- **Database**: Cloud Firestore with type-safe collections
-- **Storage**: Firebase Storage for file uploads
-- **Payments**: Stripe integration with webhooks
-- **Styling**: Tailwind CSS + Shadcn UI components
-- **Type Safety**: Full TypeScript support
-- **Developer Experience**: Hot reload, ESLint, Prettier
+## ✨ Features
 
-## Quick Start
+- **Real-time Grammar Checking** - Catch grammar mistakes as you type
+- **Style & Tone Suggestions** - Improve clarity and readability
+- **Privacy-Focused AI** - Your content stays secure and private
+- **Context-Aware Suggestions** - AI that understands what you're writing
+- **Professional Writing Tools** - Built for writers, content creators, and professionals
+
+## 🚀 Quick Start
+
+Get WordWise AI running locally with just two commands:
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+Visit [http://localhost:3005](http://localhost:3005) to see WordWise AI in action.
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 15, React 18, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Firebase (Firestore, Auth, Functions)
+- **AI**: OpenAI GPT-4 for grammar and style suggestions  
+- **Deployment**: Vercel, Firebase Hosting
+- **Analytics**: PostHog (optional)
+- **Payments**: Stripe (optional)
+
+## 📦 Development Setup
 
 ### Prerequisites
 
-- Node.js 18+ and npm
-- Firebase account and project
-- Stripe account
-- PostHog account (optional)
+- Node.js 18.x or 20.x
+- npm or yarn
+- Firebase CLI (installed globally)
 
-### Installation
+### Local Development
 
-1. Clone the repository:
+1. **Clone the repository**
    ```bash
-   git clone https://github.com/ReeceHarding/firebase-boilerplate.git
-   cd firebase-boilerplate
+   git clone <your-repo-url>
+   cd wordwise-ai
    ```
 
-2. Install dependencies:
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. Set up environment variables:
+3. **Set up environment variables**
    ```bash
    cp .env.example .env.local
+   # Fill in your Firebase and OpenAI credentials
    ```
 
-4. Configure Firebase:
+4. **Start Firebase emulators**
    ```bash
-   npm run firebase:setup
+   npm run emulators
    ```
 
-5. Run the development server:
+5. **Start development server** (in a new terminal)
    ```bash
    npm run dev
    ```
 
-## Firebase Setup
+## 🔧 Available Scripts
 
-### Quick Setup
-
-1. Run the Firebase setup script:
-   ```bash
-   npm run firebase:setup
-   ```
-
-2. Follow the instructions to:
-   - Create a Firebase project
-   - Enable Authentication providers
-   - Set up Firestore database
-   - Configure Storage buckets
-   - Download service account key
-
-### Manual Setup
-
-1. **Authentication**:
-   - Enable Email/Password provider
-   - Enable Google provider
-   - Add authorized domains
-
-2. **Firestore**:
-   - Create database in production mode
-   - Deploy security rules: `firebase deploy --only firestore:rules`
-
-3. **Storage**:
-   - Enable Cloud Storage
-   - Deploy security rules: `firebase deploy --only storage:rules`
-
-## Project Structure
-
-```
-├── actions/          # Server actions
-│   ├── db/          # Database actions
-│   └── storage/     # Storage actions
-├── app/             # Next.js app router
-├── components/      # React components
-├── lib/             # Utility functions
-├── types/           # TypeScript types
-└── public/          # Static assets
-```
-
-## Deployment
-
-### Deploy to Vercel
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ReeceHarding/firebase-boilerplate)
-
-1. Click the deploy button above
-2. Add your environment variables
-3. Deploy!
-
-### Manual Deployment
-
-1. Push to GitHub
-2. Connect to Vercel
-3. Add environment variables
-4. Deploy
-
-## Available Scripts
-
-- `npm run dev` - Start development server
+- `npm run dev` - Start development server with logging
 - `npm run build` - Build for production
+- `npm run build:export` - Build and export static site
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
-- `npm run firebase:setup` - Firebase setup wizard
-- `firebase deploy` - Deploy Firebase rules
+- `npm run format:write` - Format code with Prettier
+- `npm run type-check` - Run TypeScript type checking
+- `npm run emulators` - Start Firebase emulators
+- `npm run emulators:ui` - Start emulators with UI
 
-## Environment Variables
+## 🏗️ Project Structure
+
+```
+wordwise-ai/
+├── app/                    # Next.js app router
+│   ├── (auth)/            # Authentication routes
+│   ├── (marketing)/       # Marketing pages
+│   ├── api/               # API routes
+│   └── dashboard/         # Protected dashboard
+├── components/            # Shared React components
+│   ├── ui/               # shadcn/ui components
+│   ├── landing/          # Marketing page components
+│   └── utilities/        # Utility components
+├── lib/                  # Library code and utilities
+├── actions/              # Server actions
+├── types/                # TypeScript type definitions
+├── public/               # Static assets
+└── docs/                 # Documentation
+```
+
+## 🔐 Environment Variables
+
+Copy `.env.example` to `.env.local` and configure:
 
 ```bash
-# Firebase
+# Firebase Configuration
 NEXT_PUBLIC_FIREBASE_API_KEY=
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-NEXT_PUBLIC_FIREBASE_APP_ID=
-FIREBASE_SERVICE_ACCOUNT_PATH=
+# ... other Firebase vars
 
-# Stripe
+# OpenAI API
+OPENAI_API_KEY=
+
+# Optional: Stripe, PostHog
 STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-NEXT_PUBLIC_STRIPE_PORTAL_LINK=
-NEXT_PUBLIC_STRIPE_PAYMENT_LINK_YEARLY=
-NEXT_PUBLIC_STRIPE_PAYMENT_LINK_MONTHLY=
-
-# PostHog (optional)
 NEXT_PUBLIC_POSTHOG_KEY=
-NEXT_PUBLIC_POSTHOG_HOST=
 ```
 
-## Contributing
+## 🧪 Testing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+```bash
+# Run type checking
+npm run type-check
 
-## License
+# Run linting
+npm run lint
 
-This project is licensed under the MIT License - see the [LICENSE](license) file for details.
+# Run formatting check
+npm run format:check
+```
 
-## Links
+## 🚀 Deployment
 
-- [Documentation](docs/)
-- [Firebase Console](https://console.firebase.google.com)
-- [Demo](https://firebase-boilerplate.vercel.app)
+### Static Export
+```bash
+npm run build:export
+```
 
----
+### Firebase Hosting
+```bash
+firebase deploy --only hosting
+```
 
-Built with ❤️ using Next.js and Firebase 
+## 📝 Development Phases
+
+This project follows a structured development approach:
+
+- **Phase 1**: Foundation & Boilerplate ✅
+- **Phase 2**: Data Layer & Firebase Integration
+- **Phase 3**: Interface Layer & Components  
+- **Phase 4**: Core AI Functionality
+
+See `/docs/checklist.md` for detailed progress tracking.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/), [Firebase](https://firebase.google.com/), and [OpenAI](https://openai.com/)
+- UI components from [shadcn/ui](https://ui.shadcn.com/)
+- Icons from [Lucide React](https://lucide.dev/) 

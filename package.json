@@ -1,12 +1,14 @@
 {
-  "name": "firebase-boilerplate",
+  "name": "wordwise-ai",
   "version": "1.0.0",
+  "description": "WordWise AI - Grammar and style assistant powered by AI",
   "private": true,
   "scripts": {
     "dev": "node scripts/dev-with-logging.js",
     "dev:no-log": "node scripts/kill-port.js 3005 && next dev -p 3005",
     "dev:no-kill": "next dev -p 3005",
     "build": "next build",
+    "build:export": "next build && next export",
     "start": "next start -p 3005",
     "lint": "next lint",
     "clean": "npm run lint:fix && npm run format:write",
@@ -20,6 +22,8 @@
     "firestore:setup": "node scripts/setup-firestore.js",
     "firestore:deploy-rules": "node scripts/deploy-firestore-rules.js",
     "test:firebase": "tsx scripts/test-firebase.ts",
+    "emulators": "firebase emulators:start --only auth,firestore,functions",
+    "emulators:ui": "firebase emulators:start --only auth,firestore,functions --inspect-functions",
     "prepare": "husky install"
   },
   "dependencies": {
