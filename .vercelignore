@@ -1,0 +1,26 @@
+# Exclude Firebase Functions from Vercel build
+functions/
+
+# Exclude Firebase config files (not needed on Vercel)
+firebase.json
+.firebaserc
+firestore.rules
+firestore.indexes.json
+storage.rules
+
+# Exclude other build artifacts
+.firebase/
+.next/
+out/
+node_modules/
+
+# Exclude development files
+.env.local
+.env.example
+
+# Exclude docs and scripts not needed for deployment
+docs/
+scripts/
+*.md
+LICENSE
+license 
