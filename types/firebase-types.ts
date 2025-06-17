@@ -7,8 +7,8 @@ export interface FirebaseProfile {
   membership: "free" | "pro"
   stripeCustomerId?: string
   stripeSubscriptionId?: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date | string
+  updatedAt: Date | string
 }
 
 export interface FirebaseUser {
@@ -19,8 +19,8 @@ export interface FirebaseUser {
   photoURL?: string
   emailVerified: boolean
   phoneNumber?: string
-  createdAt: Date
-  lastLoginAt: Date
+  createdAt: Date | string
+  lastLoginAt: Date | string
 }
 
 export interface FirebaseTodo {
@@ -28,16 +28,16 @@ export interface FirebaseTodo {
   userId: string
   content: string
   completed: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date | string
+  updatedAt: Date | string
 }
 
 export interface FirebaseChat {
   id?: string
   userId: string
   name: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date | string
+  updatedAt: Date | string
 }
 
 export interface FirebaseMessage {
@@ -45,8 +45,8 @@ export interface FirebaseMessage {
   chatId: string
   content: string
   role: "assistant" | "user"
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date | string
+  updatedAt: Date | string
 }
 
 // WordWise AI Document type for user writing documents
@@ -58,8 +58,8 @@ export interface FirebaseDocument {
   wordCount: number
   readabilityScore?: number // Flesch-Kincaid grade level
   lastSuggestionCount?: number
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date | string // Support both Date (server) and string (client)
+  updatedAt: Date | string // Support both Date (server) and string (client)
 }
 
 // Application logging for monitoring and analytics
@@ -68,7 +68,7 @@ export interface FirebaseLog {
   eventType: "auth" | "document" | "suggestion" | "error" | "performance"
   uid?: string // Optional - some events may not have a user context
   sessionId?: string
-  timestamp: Date
+  timestamp: Date | string
   payload: {
     action?: string
     details?: any
@@ -79,7 +79,7 @@ export interface FirebaseLog {
     }
     metadata?: Record<string, any>
   }
-  ttl?: Date // For automatic cleanup after 30 days
+  ttl?: Date | string // For automatic cleanup after 30 days
 }
 
 // Helper type for Firestore timestamps
@@ -87,4 +87,18 @@ export type FirestoreTimestamp = {
   seconds: number
   nanoseconds: number
   toDate: () => Date
+}
+
+// Type for serialized Firebase documents (for client-side use)
+export interface SerializedFirebaseDocument
+  extends Omit<FirebaseDocument, "createdAt" | "updatedAt"> {
+  createdAt: string
+  updatedAt: string
+}
+
+// Type for serialized Firebase logs (for client-side use)
+export interface SerializedFirebaseLog
+  extends Omit<FirebaseLog, "timestamp" | "ttl"> {
+  timestamp: string
+  ttl?: string
 }

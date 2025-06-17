@@ -36,7 +36,9 @@ import {
   SortAsc,
   SortDesc,
   Filter,
-  Eye
+  Eye,
+  AlertTriangle,
+  RefreshCw
 } from "lucide-react"
 import { FirebaseDocument } from "@/types/firebase-types"
 import {
@@ -58,6 +60,7 @@ export function DocumentsDashboard({ userId }: DocumentsDashboardProps) {
   // State management
   const [documents, setDocuments] = useState<FirebaseDocument[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
   const [isCreating, setIsCreating] = useState(false)
@@ -74,8 +77,21 @@ export function DocumentsDashboard({ userId }: DocumentsDashboardProps) {
   const loadDocuments = async () => {
     console.log("[DocumentsDashboard] Loading documents...")
     setIsLoading(true)
+    setError(null)
 
     try {
+      // Validate userId before making the call
+      if (!userId) {
+        console.error("[DocumentsDashboard] Missing userId")
+        setError("User authentication required")
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "User authentication required"
+        })
+        return
+      }
+
       const result = await getUserDocumentsAction(userId)
 
       if (result.isSuccess && result.data) {
@@ -85,28 +101,58 @@ export function DocumentsDashboard({ userId }: DocumentsDashboardProps) {
           "documents"
         )
         setDocuments(result.data)
+        setError(null)
       } else {
         console.error(
           "[DocumentsDashboard] Failed to load documents:",
           result.message
         )
+        setError(result.message || "Failed to load documents")
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to load documents"
+          description: result.message || "Failed to load documents"
         })
       }
     } catch (error) {
       console.error("[DocumentsDashboard] Error loading documents:", error)
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to load documents"
+      setError(errorMessage)
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to load documents"
+        description: errorMessage
       })
     } finally {
       setIsLoading(false)
     }
   }
+
+  // Filter and sort documents
+  const filteredDocuments = documents
+    .filter(document => {
+      if (!searchQuery) return true
+      return (
+        document.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        document.content.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    })
+    .sort((a, b) => {
+      const dateA =
+        typeof a.updatedAt === "string" ? new Date(a.updatedAt) : a.updatedAt
+      const dateB =
+        typeof b.updatedAt === "string" ? new Date(b.updatedAt) : b.updatedAt
+
+      // Handle invalid dates
+      if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
+        return 0
+      }
+
+      return sortOrder === "desc"
+        ? dateB.getTime() - dateA.getTime()
+        : dateA.getTime() - dateB.getTime()
+    })
 
   // Create new document
   const handleCreateDocument = async () => {
@@ -114,6 +160,16 @@ export function DocumentsDashboard({ userId }: DocumentsDashboardProps) {
     setIsCreating(true)
 
     try {
+      // Validate userId
+      if (!userId) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "User authentication required"
+        })
+        return
+      }
+
       const result = await createDocumentAction({
         ownerUID: userId,
         title: "Untitled Document",
@@ -142,15 +198,17 @@ export function DocumentsDashboard({ userId }: DocumentsDashboardProps) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to create document"
+          description: result.message || "Failed to create document"
         })
       }
     } catch (error) {
       console.error("[DocumentsDashboard] Error creating document:", error)
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create document"
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create document"
+        description: errorMessage
       })
     } finally {
       setIsCreating(false)
@@ -190,22 +248,26 @@ export function DocumentsDashboard({ userId }: DocumentsDashboardProps) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to update document title"
+          description: result.message || "Failed to update document title"
         })
       }
     } catch (error) {
       console.error("[DocumentsDashboard] Error updating title:", error)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to update document title"
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update document title"
+        description: errorMessage
       })
     }
   }
 
   // Delete document
   const handleDeleteDocument = async (documentId: string) => {
-    console.log("[DocumentsDashboard] Deleting document:", documentId)
+    console.log("[DocumentsDashboard] Deleting document with ID:", documentId)
 
     try {
       const result = await deleteDocumentAction(documentId)
@@ -226,58 +288,91 @@ export function DocumentsDashboard({ userId }: DocumentsDashboardProps) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to delete document"
+          description: result.message || "Failed to delete document"
         })
       }
     } catch (error) {
       console.error("[DocumentsDashboard] Error deleting document:", error)
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete document"
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to delete document"
+        description: errorMessage
       })
     }
   }
 
   // Open document in editor
   const handleOpenDocument = (documentId: string) => {
-    console.log("[DocumentsDashboard] Opening document:", documentId)
+    console.log("[DocumentsDashboard] Opening document with ID:", documentId)
     router.push(`/editor?id=${documentId}`)
   }
 
-  // Filter and sort documents
-  const filteredDocuments = documents
-    .filter(
-      doc =>
-        doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.content.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .sort((a, b) => {
-      const dateA = new Date(a.updatedAt).getTime()
-      const dateB = new Date(b.updatedAt).getTime()
-      return sortOrder === "desc" ? dateB - dateA : dateA - dateB
-    })
+  // Format date - handle both Date objects and ISO strings
+  const formatDate = (date: Date | string) => {
+    console.log("[DocumentsDashboard] Formatting date:", date)
 
-  // Format date
-  const formatDate = (date: Date) => {
     const now = new Date()
-    const diffInHours =
-      (now.getTime() - new Date(date).getTime()) / (1000 * 60 * 60)
+    const dateObj = typeof date === "string" ? new Date(date) : date
+
+    // Validate date
+    if (isNaN(dateObj.getTime())) {
+      console.warn("[DocumentsDashboard] Invalid date:", date)
+      return "Invalid date"
+    }
+
+    const diffInHours = (now.getTime() - dateObj.getTime()) / (1000 * 60 * 60)
 
     if (diffInHours < 24) {
-      return new Date(date).toLocaleTimeString([], {
+      return dateObj.toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit"
       })
     } else if (diffInHours < 168) {
       // 7 days
-      return new Date(date).toLocaleDateString([], { weekday: "short" })
+      return dateObj.toLocaleDateString([], { weekday: "short" })
     } else {
-      return new Date(date).toLocaleDateString([], {
+      return dateObj.toLocaleDateString([], {
         month: "short",
         day: "numeric"
       })
     }
+  }
+
+  // Error state
+  if (error && !isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">My Documents</h1>
+            <p className="text-gray-600">
+              Create and manage your writing documents
+            </p>
+          </div>
+        </div>
+
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <AlertTriangle className="mb-4 size-12 text-red-500" />
+            <h3 className="mb-2 text-lg font-medium text-red-900">
+              Error Loading Documents
+            </h3>
+            <p className="mb-4 text-center text-red-700">{error}</p>
+            <Button
+              onClick={loadDocuments}
+              disabled={isLoading}
+              variant="outline"
+              className="border-red-300 text-red-700 hover:bg-red-100"
+            >
+              <RefreshCw className="mr-2 size-4" />
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (

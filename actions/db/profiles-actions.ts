@@ -10,179 +10,167 @@ import { db, collections } from "@/db/db"
 import { FirebaseProfile } from "@/types/firebase-types"
 import { ActionState } from "@/types"
 import { FieldValue } from 'firebase-admin/firestore'
+import { serializeFirebaseDocument } from "@/lib/utils"
 
 export async function createProfileAction(
   data: Omit<FirebaseProfile, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<ActionState<FirebaseProfile>> {
-  console.log('[Profiles Action] Creating profile for user:', data.userId)
-  console.log('[Profiles Action] Profile data:', JSON.stringify(data, null, 2))
-  
-  if (!db) {
-    console.error('[Profiles Action] Database not initialized')
-    return { isSuccess: false, message: "Database not initialized" }
-  }
+  console.log("[createProfileAction] Starting profile creation for user:", data.userId)
   
   try {
-    const profileDataToCreate = {
+    // Validate required fields
+    if (!data.userId) {
+      console.error("[createProfileAction] Missing userId")
+      return { isSuccess: false, message: "User ID is required" }
+    }
+
+    if (!data.email) {
+      console.error("[createProfileAction] Missing email")
+      return { isSuccess: false, message: "Email is required" }
+    }
+
+    if (!db) {
+      console.error("[createProfileAction] Firestore is not initialized")
+      return { isSuccess: false, message: "Database connection failed - Please check Firebase configuration" }
+    }
+
+    const profileData = {
       ...data,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp()
     }
     
-    console.log('[Profiles Action] Attempting to add document to collection:', collections.profiles)
-    const docRef = await db.collection(collections.profiles).add(profileDataToCreate)
-    console.log('[Profiles Action] Profile created with ID:', docRef.id)
-    
-    // Wait a bit for server timestamps to resolve
-    await new Promise(resolve => setTimeout(resolve, 100))
-    
+    console.log("[createProfileAction] Creating profile in Firestore")
+    const docRef = await db.collection(collections.profiles).add(profileData)
     const newProfile = await docRef.get()
-    const retrievedProfileData = newProfile.data()
     
-    // Handle case where data might be null
-    if (!retrievedProfileData) {
-      console.error('[Profiles Action] Profile data is null after creation')
-      // Return with the data we know, using current date for timestamps
-      const profileWithId = { 
-        id: docRef.id, 
-        ...data,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      } as FirebaseProfile
-      
-      return {
-        isSuccess: true,
-        message: "Profile created successfully",
-        data: profileWithId
-      }
+    if (!newProfile.exists) {
+      console.error("[createProfileAction] Profile creation failed - profile not found after creation")
+      return { isSuccess: false, message: "Failed to create profile" }
     }
+
+    const profileWithId = { id: docRef.id, ...newProfile.data() } as FirebaseProfile
     
-    const profileWithId = { id: docRef.id, ...retrievedProfileData } as FirebaseProfile
+    // Serialize the profile for client transfer
+    const serializedProfile = serializeFirebaseDocument(profileWithId)
     
-    console.log('[Profiles Action] Profile created successfully')
+    console.log("[createProfileAction] Profile created successfully with ID:", docRef.id)
     return {
       isSuccess: true,
       message: "Profile created successfully",
-      data: profileWithId
+      data: serializedProfile
     }
-  } catch (error: any) {
-    // Simplify error logging to avoid source map issues in Next.js dev mode
-    console.error("[Profiles Action] Error creating profile:", error?.message || "Unknown error")
+  } catch (error) {
+    console.error("[createProfileAction] Error creating profile:", error)
     
-    // Log specific error properties separately to avoid formatting issues
-    if (error?.code) {
-      console.error("[Profiles Action] Error code:", error.code)
-    }
-    
-    // Check if it's a Firestore not enabled error
-    if (error?.code === 5 || error?.code === 'NOT_FOUND' || error?.message?.includes('NOT_FOUND')) {
-      console.error('[Profiles Action] Firestore is not enabled in Firebase project')
-      return { 
-        isSuccess: false, 
-        message: "Firestore is not enabled. Please enable Firestore in your Firebase Console at https://console.firebase.google.com" 
-      }
+    // Check for specific Firestore errors
+    if (error instanceof Error && error.message.includes("Firestore is not enabled")) {
+      return { isSuccess: false, message: "Firestore is not enabled for this project" }
     }
     
-    // Check if it's a permission error
-    if (error?.code === 7 || error?.code === 'PERMISSION_DENIED') {
-      console.error('[Profiles Action] Permission denied - check Firestore rules')
-      return { 
-        isSuccess: false, 
-        message: "Permission denied. Please check your Firestore security rules." 
-      }
-    }
-    
-    return { isSuccess: false, message: `Failed to create profile: ${error?.message || 'Unknown error'}` }
+    return { isSuccess: false, message: "Failed to create profile - Please try again" }
   }
 }
 
 export async function getProfileByUserIdAction(
-  userId: string
+  userId: string | null
 ): Promise<ActionState<FirebaseProfile>> {
-  console.log('[Profiles Action] Getting profile for user:', userId)
-  
-  if (!db) {
-    console.error('[Profiles Action] Database not initialized')
-    return { isSuccess: false, message: "Database not initialized" }
-  }
+  console.log("[getProfileByUserIdAction] Fetching profile for user:", userId)
   
   try {
-    const querySnapshot = await db
+    // Validate input
+    if (!userId) {
+      console.error("[getProfileByUserIdAction] Missing or null userId")
+      return { isSuccess: false, message: "User ID is required" }
+    }
+
+    if (!db) {
+      console.error("[getProfileByUserIdAction] Firestore is not initialized")
+      return { isSuccess: false, message: "Database connection failed - Please check Firebase configuration" }
+    }
+
+    const snapshot = await db
       .collection(collections.profiles)
       .where('userId', '==', userId)
-      .limit(1)
       .get()
     
-    if (querySnapshot.empty) {
-      console.log('[Profiles Action] Profile not found for user:', userId)
+    if (snapshot.empty) {
+      console.log("[getProfileByUserIdAction] Profile not found for user:", userId)
       return { isSuccess: false, message: "Profile not found" }
     }
     
-    const doc = querySnapshot.docs[0]
+    const doc = snapshot.docs[0]
     const profile = { id: doc.id, ...doc.data() } as FirebaseProfile
     
-    console.log('[Profiles Action] Profile retrieved successfully')
+    // Serialize the profile for client transfer
+    const serializedProfile = serializeFirebaseDocument(profile)
+    
+    console.log("[getProfileByUserIdAction] Profile fetched successfully")
+    
     return {
       isSuccess: true,
-      message: "Profile retrieved successfully",
-      data: profile
+      message: "Profile fetched successfully",
+      data: serializedProfile
     }
-  } catch (error: any) {
-    console.error("[Profiles Action] Error getting profile by user id:", error?.message || error)
-    // If it's a NOT_FOUND error, it might be because the collection doesn't exist yet
-    if (error?.code === 5 || error?.message?.includes('NOT_FOUND')) {
-      console.log('[Profiles Action] Collection might not exist yet. It will be created when first profile is added.')
-      return { isSuccess: false, message: "Profile not found - collection may not exist yet" }
+  } catch (error) {
+    console.error("[getProfileByUserIdAction] Error fetching profile:", error)
+    
+    // Check for specific Firestore errors
+    if (error instanceof Error && error.message.includes("collection may not exist yet")) {
+      return { isSuccess: false, message: "Profile collection may not exist yet - Please check Firebase configuration" }
     }
-    return { isSuccess: false, message: "Failed to get profile" }
+    
+    return { isSuccess: false, message: "Failed to fetch profile - Please try again" }
   }
 }
 
 export async function updateProfileAction(
-  userId: string,
-  data: Partial<Omit<FirebaseProfile, 'id' | 'createdAt' | 'updatedAt'>>
+  profileId: string,
+  data: Partial<Omit<FirebaseProfile, 'id' | 'userId' | 'createdAt'>>
 ): Promise<ActionState<FirebaseProfile>> {
-  console.log('[Profiles Action] Updating profile for user:', userId)
-  
-  if (!db) {
-    console.error('[Profiles Action] Database not initialized')
-    return { isSuccess: false, message: "Database not initialized" }
-  }
+  console.log("[updateProfileAction] Updating profile with ID:", profileId)
   
   try {
-    // First find the profile
-    const querySnapshot = await db
-      .collection(collections.profiles)
-      .where('userId', '==', userId)
-      .limit(1)
-      .get()
-    
-    if (querySnapshot.empty) {
-      console.log('[Profiles Action] Profile not found for update')
-      return { isSuccess: false, message: "Profile not found to update" }
+    // Validate input
+    if (!profileId) {
+      console.error("[updateProfileAction] Missing profile ID")
+      return { isSuccess: false, message: "Profile ID is required" }
     }
-    
-    const doc = querySnapshot.docs[0]
+
+    if (!db) {
+      console.error("[updateProfileAction] Firestore is not initialized")
+      return { isSuccess: false, message: "Database connection failed - Please check Firebase configuration" }
+    }
+
     const updateData = {
       ...data,
       updatedAt: FieldValue.serverTimestamp()
     }
     
-    await doc.ref.update(updateData)
-    console.log('[Profiles Action] Profile updated in Firestore')
+    console.log("[updateProfileAction] Updating profile in Firestore")
+    await db.collection(collections.profiles).doc(profileId).update(updateData)
     
-    const updatedDoc = await doc.ref.get()
-    const updatedProfile = { id: doc.id, ...updatedDoc.data() } as FirebaseProfile
+    const updatedDoc = await db.collection(collections.profiles).doc(profileId).get()
     
-    console.log('[Profiles Action] Profile updated successfully')
+    if (!updatedDoc.exists) {
+      console.error("[updateProfileAction] Profile not found after update")
+      return { isSuccess: false, message: "Profile not found" }
+    }
+
+    const updatedProfile = { id: updatedDoc.id, ...updatedDoc.data() } as FirebaseProfile
+    
+    // Serialize the profile for client transfer
+    const serializedProfile = serializeFirebaseDocument(updatedProfile)
+    
+    console.log("[updateProfileAction] Profile updated successfully")
     return {
       isSuccess: true,
       message: "Profile updated successfully",
-      data: updatedProfile
+      data: serializedProfile
     }
   } catch (error) {
-    console.error("[Profiles Action] Error updating profile:", error)
-    return { isSuccess: false, message: "Failed to update profile" }
+    console.error("[updateProfileAction] Error updating profile:", error)
+    return { isSuccess: false, message: "Failed to update profile - Please try again" }
   }
 }
 
@@ -240,36 +228,33 @@ export async function updateProfileByStripeCustomerIdAction(
 }
 
 export async function deleteProfileAction(
-  userId: string
-): Promise<ActionState<void>> {
-  console.log('[Profiles Action] Deleting profile for user:', userId)
-  
-  if (!db) {
-    console.error('[Profiles Action] Database not initialized')
-    return { isSuccess: false, message: "Database not initialized" }
-  }
+  profileId: string
+): Promise<ActionState<undefined>> {
+  console.log("[deleteProfileAction] Deleting profile with ID:", profileId)
   
   try {
-    const querySnapshot = await db
-      .collection(collections.profiles)
-      .where('userId', '==', userId)
-      .limit(1)
-      .get()
-    
-    if (!querySnapshot.empty) {
-      await querySnapshot.docs[0].ref.delete()
-      console.log('[Profiles Action] Profile deleted successfully')
-    } else {
-      console.log('[Profiles Action] No profile found to delete')
+    // Validate input
+    if (!profileId) {
+      console.error("[deleteProfileAction] Missing profile ID")
+      return { isSuccess: false, message: "Profile ID is required" }
     }
+
+    if (!db) {
+      console.error("[deleteProfileAction] Firestore is not initialized")
+      return { isSuccess: false, message: "Database connection failed - Please check Firebase configuration" }
+    }
+
+    console.log("[deleteProfileAction] Deleting profile from Firestore")
+    await db.collection(collections.profiles).doc(profileId).delete()
     
+    console.log("[deleteProfileAction] Profile deleted successfully")
     return {
       isSuccess: true,
       message: "Profile deleted successfully",
       data: undefined
     }
   } catch (error) {
-    console.error("[Profiles Action] Error deleting profile:", error)
-    return { isSuccess: false, message: "Failed to delete profile" }
+    console.error("[deleteProfileAction] Error deleting profile:", error)
+    return { isSuccess: false, message: "Failed to delete profile - Please try again" }
   }
 }
