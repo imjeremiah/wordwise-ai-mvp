@@ -1,10 +1,11 @@
 "use client"
 
-import { initializeApp } from "firebase/app"
+import { initializeApp, getApps, getApp } from "firebase/app"
 import { getAuth, connectAuthEmulator } from "firebase/auth"
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore"
 import { getStorage, connectStorageEmulator } from "firebase/storage"
 import { getAnalytics, isSupported } from "firebase/analytics"
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions"
 
 // Firebase configuration - these should be set in your environment variables
 const firebaseConfig = {
@@ -36,18 +37,21 @@ console.log("[Firebase Client] Initializing Firebase with config:", {
 })
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig)
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
 console.log("[Firebase Client] Firebase app initialized")
 
 // Initialize services
-export const auth = getAuth(app)
+const auth = getAuth(app)
 console.log("[Firebase Client] Auth service initialized")
 
-export const db = getFirestore(app)
+const db = getFirestore(app)
 console.log("[Firebase Client] Firestore service initialized")
 
-export const storage = getStorage(app)
+const storage = getStorage(app)
 console.log("[Firebase Client] Storage service initialized")
+
+const functions = getFunctions(app, "us-central1")
+console.log("[Firebase Client] Functions service initialized")
 
 // Initialize Analytics (only in browser and with real credentials)
 if (typeof window !== "undefined" && hasRealCredentials) {
@@ -79,6 +83,9 @@ if (
 
     connectStorageEmulator(storage, "localhost", 9199)
     console.log("[Firebase Client] Connected to Storage emulator")
+
+    connectFunctionsEmulator(functions, "localhost", 5001)
+    console.log("[Firebase Client] Connected to Functions emulator")
   } catch (error) {
     console.error("[Firebase Client] Error connecting to emulators:", error)
   }
@@ -87,4 +94,4 @@ if (
 // Export flag for checking if credentials are available
 export { hasRealCredentials }
 
-export default app
+export { app, auth, db, storage, functions }

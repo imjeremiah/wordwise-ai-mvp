@@ -9,7 +9,6 @@ Handles caching, rate limiting, and error management
 */
 
 import { auth } from "@/lib/firebase-auth"
-import { adminAuth } from "@/lib/firebase-config"
 import { ActionState } from "@/types"
 
 // Types for AI suggestions
@@ -67,114 +66,66 @@ export async function getAISuggestionsAction(
   documentId?: string
 ): Promise<ActionState<SuggestionResponse>> {
   console.log("[getAISuggestionsAction] Starting AI suggestions request")
-  console.log("[getAISuggestionsAction] Text length:", text.length)
-  console.log("[getAISuggestionsAction] Document ID:", documentId)
-  
   const startTime = Date.now()
-  
+
   try {
-    // Check authentication
     const session = await auth()
     if (!session || !session.userId) {
       console.error("[getAISuggestionsAction] No authenticated session")
-      return { isSuccess: false, message: "Authentication required" }
+      return { isSuccess: false, message: "Authentication failed" }
     }
 
     console.log("[getAISuggestionsAction] Authenticated user:", session.userId)
 
-    // Validate input
-    if (!text || text.trim().length === 0) {
-      console.log("[getAISuggestionsAction] Empty text provided")
-      return { isSuccess: false, message: "Text content is required" }
+    if (!text || text.trim().length < 10) {
+      return {
+        isSuccess: true,
+        message: "Text too short for analysis.",
+        data: {
+          suggestions: [],
+          wordCount: 0,
+          readabilityScore: 0,
+          processingTime: 0,
+          cached: false
+        }
+      }
     }
 
     if (text.length > 10000) {
-      console.error("[getAISuggestionsAction] Text too long:", text.length)
-      return { isSuccess: false, message: "Text must be less than 10,000 characters" }
+      return {
+        isSuccess: false,
+        message: "Text must be less than 10,000 characters"
+      }
     }
 
-    // Check if Firebase Admin is available
-    if (!adminAuth) {
-      console.error("[getAISuggestionsAction] Firebase Admin not initialized")
-      return { isSuccess: false, message: "AI service unavailable - Firebase not configured" }
-    }
+    // Call Firebase Cloud Function directly via HTTP
+    const functionUrl = `https://us-central1-${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.cloudfunctions.net/analyzeSuggestions`
+    console.log("[getAISuggestionsAction] Calling Cloud Function via HTTP:", functionUrl)
 
-    // Create custom token and exchange it for an ID token
-    console.log("[getAISuggestionsAction] Creating custom token for user:", session.userId)
-    const customToken = await adminAuth.createCustomToken(session.userId)
-    console.log("[getAISuggestionsAction] Custom token created successfully")
-
-    // Exchange custom token for ID token using Firebase Auth REST API
-    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY
-    
-    if (!projectId || !apiKey) {
-      console.error("[getAISuggestionsAction] Firebase config not complete")
-      return { isSuccess: false, message: "AI service unavailable - Firebase not configured" }
-    }
-
-    console.log("[getAISuggestionsAction] Exchanging custom token for ID token")
-    const tokenExchangeResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${apiKey}`, {
+    const response = await fetch(functionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        token: customToken,
-        returnSecureToken: true
+        data: {
+          text: text,
+          userId: session.userId,
+          documentId
+        }
       })
     })
 
-    if (!tokenExchangeResponse.ok) {
-      const errorText = await tokenExchangeResponse.text()
-      console.error("[getAISuggestionsAction] Token exchange failed:", errorText)
-      return { isSuccess: false, message: "Authentication failed" }
-    }
-
-    const tokenData = await tokenExchangeResponse.json()
-    const idToken = tokenData.idToken
-
-    if (!idToken) {
-      console.error("[getAISuggestionsAction] No ID token received")
-      return { isSuccess: false, message: "Authentication failed" }
-    }
-
-    console.log("[getAISuggestionsAction] ID token obtained successfully")
-
-    // Prepare request data
-    const functionData = {
-      text: text.trim(),
-      userId: session.userId,
-      documentId,
-      language: 'en'
-    }
-
-    // Cloud Functions endpoint URL for callable functions
-    const functionUrl = `https://us-central1-${projectId}.cloudfunctions.net/analyzeSuggestions`
-    console.log("[getAISuggestionsAction] Making HTTP request to:", functionUrl)
-
-    // Make authenticated HTTP request to Cloud Function with ID token
-    const response = await fetch(functionUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${idToken}`,
-      },
-      body: JSON.stringify({ data: functionData })
-    })
-
-    console.log("[getAISuggestionsAction] HTTP response status:", response.status)
-    console.log("[getAISuggestionsAction] HTTP response headers:", Object.fromEntries(response.headers.entries()))
-
     if (!response.ok) {
+      console.error("[getAISuggestionsAction] HTTP error:", response.status, response.statusText)
       const errorText = await response.text()
-      console.error("[getAISuggestionsAction] HTTP error response:", errorText)
+      console.error("[getAISuggestionsAction] Error response:", errorText)
       
       if (response.status === 401) {
-        return { isSuccess: false, message: "Authentication failed" }
+        return { isSuccess: false, message: "Authentication failed. Please sign in again." }
       }
       if (response.status === 403) {
-        return { isSuccess: false, message: "Access denied" }
+        return { isSuccess: false, message: "Access denied." }
       }
       if (response.status === 429) {
         return { isSuccess: false, message: "Rate limit exceeded. Please try again later." }
@@ -196,30 +147,28 @@ export async function getAISuggestionsAction(
 
     console.log("[getAISuggestionsAction] Suggestions count:", suggestionsData.suggestions.length)
     console.log("[getAISuggestionsAction] Processing time:", suggestionsData.processingTime + "ms")
-    console.log("[getAISuggestionsAction] Cached:", suggestionsData.cached)
-    console.log("[getAISuggestionsAction] Readability score:", suggestionsData.readabilityScore)
 
-    // Log the request duration
     const totalTime = Date.now() - startTime
     console.log("[getAISuggestionsAction] Total request time:", totalTime + "ms")
 
     return {
       isSuccess: true,
-      message: suggestionsData.cached 
-        ? "Suggestions retrieved from cache" 
+      message: suggestionsData.cached
+        ? "Suggestions retrieved from cache"
         : "AI analysis completed successfully",
       data: {
         ...suggestionsData,
         processingTime: totalTime // Include total round-trip time
       }
     }
-
   } catch (error: any) {
     const totalTime = Date.now() - startTime
-    console.error("[getAISuggestionsAction] Error getting AI suggestions:", error)
-    console.error("[getAISuggestionsAction] Error message:", error.message)
+    console.error("[getAISuggestionsAction] Error calling Cloud Function:", error)
     console.error("[getAISuggestionsAction] Total time before error:", totalTime + "ms")
 
+    // Handle network and other errors
+    const errorMessage = error.message || "An unexpected error occurred."
+    
     // Handle network errors
     if (error.name === 'TypeError' && error.message.includes('fetch')) {
       return { 
@@ -228,9 +177,9 @@ export async function getAISuggestionsAction(
       }
     }
 
-    return { 
-      isSuccess: false, 
-      message: "Failed to analyze text. Please try again." 
+    return {
+      isSuccess: false,
+      message: `Analysis failed: ${errorMessage}`
     }
   }
 }
@@ -240,9 +189,8 @@ export async function getAISuggestionsAction(
  */
 export async function getUserUsageAction(): Promise<ActionState<UsageStats>> {
   console.log("[getUserUsageAction] Getting user usage statistics")
-  
+
   try {
-    // Check authentication
     const session = await auth()
     if (!session || !session.userId) {
       console.error("[getUserUsageAction] No authenticated session")
@@ -251,73 +199,24 @@ export async function getUserUsageAction(): Promise<ActionState<UsageStats>> {
 
     console.log("[getUserUsageAction] Getting usage for user:", session.userId)
 
-    // Check if Firebase Admin is available
-    if (!adminAuth) {
-      console.error("[getUserUsageAction] Firebase Admin not initialized")
-      return { isSuccess: false, message: "Service unavailable - Firebase not configured" }
-    }
+    // Call Firebase Cloud Function directly via HTTP
+    const functionUrl = `https://us-central1-${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.cloudfunctions.net/getUserUsage`
+    console.log("[getUserUsageAction] Calling Cloud Function via HTTP:", functionUrl)
 
-    // Create custom token and exchange it for an ID token
-    console.log("[getUserUsageAction] Creating custom token for user:", session.userId)
-    const customToken = await adminAuth.createCustomToken(session.userId)
-    console.log("[getUserUsageAction] Custom token created successfully")
-
-    // Exchange custom token for ID token using Firebase Auth REST API
-    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY
-    
-    if (!projectId || !apiKey) {
-      console.error("[getUserUsageAction] Firebase config not complete")
-      return { isSuccess: false, message: "Service unavailable - Firebase not configured" }
-    }
-
-    console.log("[getUserUsageAction] Exchanging custom token for ID token")
-    const tokenExchangeResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${apiKey}`, {
+    const response = await fetch(functionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        token: customToken,
-        returnSecureToken: true
+        data: { userId: session.userId }
       })
     })
 
-    if (!tokenExchangeResponse.ok) {
-      const errorText = await tokenExchangeResponse.text()
-      console.error("[getUserUsageAction] Token exchange failed:", errorText)
-      return { isSuccess: false, message: "Authentication failed" }
-    }
-
-    const tokenData = await tokenExchangeResponse.json()
-    const idToken = tokenData.idToken
-
-    if (!idToken) {
-      console.error("[getUserUsageAction] No ID token received")
-      return { isSuccess: false, message: "Authentication failed" }
-    }
-
-    console.log("[getUserUsageAction] ID token obtained successfully")
-
-    // Cloud Functions endpoint URL
-    const functionUrl = `https://us-central1-${projectId}.cloudfunctions.net/getUserUsage`
-    console.log("[getUserUsageAction] Making HTTP request to:", functionUrl)
-
-    // Make authenticated HTTP request to Cloud Function with ID token
-    const response = await fetch(functionUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${idToken}`,
-      },
-      body: JSON.stringify({ data: { userId: session.userId } })
-    })
-
-    console.log("[getUserUsageAction] HTTP response status:", response.status)
-
     if (!response.ok) {
+      console.error("[getUserUsageAction] HTTP error:", response.status, response.statusText)
       const errorText = await response.text()
-      console.error("[getUserUsageAction] HTTP error response:", errorText)
+      console.error("[getUserUsageAction] Error response:", errorText)
       return { isSuccess: false, message: "Failed to get usage statistics" }
     }
 
@@ -329,23 +228,28 @@ export async function getUserUsageAction(): Promise<ActionState<UsageStats>> {
       return { isSuccess: false, message: "Invalid response from service" }
     }
 
-    console.log("[getUserUsageAction] Usage statistics retrieved:")
-    console.log("[getUserUsageAction] Monthly:", usageData.monthly)
-    console.log("[getUserUsageAction] Daily:", usageData.daily)
-    console.log("[getUserUsageAction] Hourly:", usageData.hourly)
+    console.log("[getUserUsageAction] Usage statistics retrieved")
 
     return {
       isSuccess: true,
       message: "Usage statistics retrieved successfully",
       data: usageData
     }
-
   } catch (error: any) {
     console.error("[getUserUsageAction] Error getting usage statistics:", error)
     
-    return { 
-      isSuccess: false, 
-      message: "Failed to get usage statistics" 
+    // Handle network errors
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      return { 
+        isSuccess: false, 
+        message: "Network error. Please check your connection and try again." 
+      }
+    }
+    
+    const errorMessage = error.message || "An unexpected error occurred."
+    return {
+      isSuccess: false,
+      message: `Failed to get usage statistics: ${errorMessage}`
     }
   }
 }
