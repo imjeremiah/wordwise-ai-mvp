@@ -17,6 +17,31 @@ service cloud.firestore {
       allow delete: if request.auth != null && request.auth.uid == resource.data.uid;
     }
     
+    // WordWise AI: Allow users to read/write only their own documents
+    match /documents/{document} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.ownerUID;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerUID;
+      allow update: if request.auth != null && request.auth.uid == resource.data.ownerUID;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.ownerUID;
+    }
+    
+    // WordWise AI: Logs collection - only authenticated users can create logs, read own logs
+    match /logs/{document} {
+      // Users can read their own logs (where uid matches)
+      allow read: if request.auth != null && 
+                     (resource.data.uid == request.auth.uid || 
+                      request.auth.uid in ['admin']); // Allow admin access if needed
+      
+      // Anyone authenticated can create logs (for error tracking, etc.)
+      allow create: if request.auth != null;
+      
+      // No updates or deletes - logs are immutable for audit purposes
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // Legacy collections (keeping for compatibility)
+    
     // Allow users to read/write their own todos
     match /todos/{document} {
       allow read: if request.auth != null && request.auth.uid == resource.data.userId;

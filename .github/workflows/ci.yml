@@ -39,14 +39,14 @@ jobs:
     - name: Build application
       run: npm run build
       
-    - name: Export static site
+    - name: Export static site (temporarily disabled)
       run: npm run build:export
       
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: build-artifacts-${{ matrix.node-version }}
-        path: out/
+        path: .next/
         retention-days: 7
         
     # TODO: Uncomment for Phase 2 when Firebase secrets are added

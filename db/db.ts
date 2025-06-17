@@ -19,10 +19,17 @@ if (adminDb) {
 // Export the Firestore instance (may be null if Firebase is not configured)
 export const db = adminDb
 
-// Collection references
+// Collection references for WordWise AI
 export const collections = {
+  // User management collections
   profiles: "profiles",
   users: "users",
+
+  // WordWise AI core collections
+  documents: "documents", // User writing documents
+  logs: "logs", // Application logging and monitoring
+
+  // Legacy collections (keeping for compatibility)
   todos: "todos",
   chats: "chats",
   messages: "messages"
