@@ -22,6 +22,8 @@
     "firestore:setup": "node scripts/setup-firestore.js",
     "firestore:deploy-rules": "node scripts/deploy-firestore-rules.js",
     "test:firebase": "tsx scripts/test-firebase.ts",
+    "test:auth": "node scripts/test-auth-flows.js",
+    "setup:env": "node scripts/setup-env.js",
     "emulators": "firebase emulators:start --only auth,firestore,functions",
     "emulators:ui": "firebase emulators:start --only auth,firestore,functions --inspect-functions",
     "prepare": "husky install"
