@@ -113,19 +113,19 @@ export function AppSidebar({ profile }: AppSidebarProps) {
   ]
 
   return (
-    <Sidebar className="border-r border-purple-100/20">
-      <SidebarHeader className="border-b border-purple-100/20">
+    <Sidebar className="border-r border-green-100/20">
+      <SidebarHeader className="border-b border-green-100/20">
         <Link href="/" className="group flex items-center gap-3 px-2 py-4">
-          <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-400 shadow-lg shadow-purple-500/20 transition-shadow group-hover:shadow-purple-500/30">
-            <span className="text-sm font-bold text-white">FB</span>
+          <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-r from-green-600 to-green-400 shadow-lg shadow-green-500/20 transition-shadow group-hover:shadow-green-500/30">
+            <span className="text-sm font-bold text-white">WW</span>
           </div>
-          <span className="bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-lg font-semibold text-transparent">
-            Firebase Boilerplate
+          <span className="bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-lg font-semibold text-transparent">
+            WordWise AI
           </span>
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="from-background bg-gradient-to-b to-purple-50/20">
+      <SidebarContent className="from-background bg-gradient-to-b to-green-50/20">
         <SidebarGroup>
           <SidebarMenu>
             {menuItems.map(item => (
@@ -137,7 +137,7 @@ export function AppSidebar({ profile }: AppSidebarProps) {
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className="hover:bg-purple-50 hover:text-purple-700 data-[state=open]:bg-purple-50 data-[state=open]:text-purple-700">
+                        <SidebarMenuButton className="hover:bg-green-50 hover:text-green-700 data-[state=open]:bg-green-50 data-[state=open]:text-green-700">
                           <item.icon className="size-4" />
                           <span>{item.title}</span>
                           <ChevronDown className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
@@ -149,7 +149,7 @@ export function AppSidebar({ profile }: AppSidebarProps) {
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton
                                 asChild
-                                className="hover:bg-purple-50 hover:text-purple-700"
+                                className="hover:bg-green-50 hover:text-green-700"
                               >
                                 <Link href={subItem.href}>
                                   {subItem.icon && (
@@ -168,7 +168,7 @@ export function AppSidebar({ profile }: AppSidebarProps) {
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
-                      className="hover:bg-purple-50 hover:text-purple-700"
+                      className="hover:bg-green-50 hover:text-green-700"
                     >
                       <Link href={item.href}>
                         <item.icon className="size-4" />
@@ -183,21 +183,21 @@ export function AppSidebar({ profile }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-purple-100/20">
+      <SidebarFooter className="border-t border-green-100/20">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="w-full justify-start hover:bg-purple-50 hover:text-purple-700 data-[state=open]:bg-purple-50 data-[state=open]:text-purple-700"
+                  className="w-full justify-start hover:bg-green-50 hover:text-green-700 data-[state=open]:bg-green-50 data-[state=open]:text-green-700"
                 >
-                  <Avatar className="mr-2 size-8 border-2 border-purple-200/50">
+                  <Avatar className="mr-2 size-8 border-2 border-green-200/50">
                     <AvatarImage
                       src={profile?.photoURL || ""}
                       alt={profile?.displayName}
                     />
-                    <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-400 text-white">
+                    <AvatarFallback className="bg-gradient-to-r from-green-600 to-green-400 text-white">
                       {profile?.displayName?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
@@ -213,12 +213,12 @@ export function AppSidebar({ profile }: AppSidebarProps) {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] border-purple-100/20 bg-white/90 backdrop-blur-md dark:bg-gray-900/90"
+                className="w-[--radix-dropdown-menu-trigger-width] border-green-100/20 bg-white/90 backdrop-blur-md dark:bg-gray-900/90"
                 align="start"
               >
                 <DropdownMenuItem
                   asChild
-                  className="cursor-pointer hover:bg-purple-50 hover:text-purple-700"
+                  className="cursor-pointer hover:bg-green-50 hover:text-green-700"
                 >
                   <Link href="/dashboard/profile">
                     <User className="mr-2 size-4" />
@@ -227,14 +227,14 @@ export function AppSidebar({ profile }: AppSidebarProps) {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   asChild
-                  className="cursor-pointer hover:bg-purple-50 hover:text-purple-700"
+                  className="cursor-pointer hover:bg-green-50 hover:text-green-700"
                 >
                   <Link href="/dashboard/settings">
                     <Settings className="mr-2 size-4" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-purple-100/20" />
+                <DropdownMenuSeparator className="bg-green-100/20" />
                 <DropdownMenuItem
                   onClick={handleLogout}
                   className="cursor-pointer hover:bg-red-50 hover:text-red-700"
