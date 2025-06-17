@@ -4,7 +4,7 @@ import { ActionState } from "@/types"
 import { auth } from "@/lib/firebase-auth"
 import { AppLogger } from "@/lib/logger"
 import { adminAuth } from "@/lib/firebase-config"
-import { deleteProfileByUserIdAction } from "@/actions/db/profiles-actions"
+import { deleteProfileAction } from "@/actions/db/profiles-actions"
 import { deleteUserAction } from "@/actions/db/users-actions"
 
 // Generate password reset link
@@ -106,13 +106,15 @@ export async function deleteUserAccountAction(): Promise<ActionState<undefined>>
     
     // Log the deletion event before deleting
     const logger = new AppLogger(userId)
-    await logger.logAuth("account_deletion", {
-      timestamp: new Date().toISOString()
+    await logger.logError("User account deletion initiated", {
+      userId,
+      timestamp: new Date().toISOString(),
+      action: "account_deletion"
     })
     
     // Delete user profile from Firestore
     console.log("[deleteUserAccountAction] Deleting user profile")
-    await deleteProfileByUserIdAction(userId)
+    await deleteProfileAction(userId)
     
     // Delete user record from Firestore
     console.log("[deleteUserAccountAction] Deleting user record")
@@ -164,9 +166,11 @@ export async function updateUserEmailAction(
     
     // Log the event
     const logger = new AppLogger(userId)
-    await logger.logAuth("email_update", {
+    await logger.logError("User email update initiated", {
+      userId,
       newEmail,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      action: "email_update"
     })
     
     console.log("[updateUserEmailAction] Email updated successfully")
@@ -230,9 +234,11 @@ export async function sendEmailVerificationAction(): Promise<ActionState<undefin
     
     // Log the event
     const logger = new AppLogger(userId)
-    await logger.logAuth("email_verification_sent", {
+    await logger.logError("Email verification sent", {
+      userId,
       email: user.email,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      action: "email_verification_sent"
     })
     
     return {

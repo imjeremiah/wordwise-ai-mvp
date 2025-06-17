@@ -8,7 +8,45 @@ and error handling scenarios for WordWise AI
 </ai_context>
 */
 
-const { adminAuth, adminDb } = require('../lib/firebase-config.js');
+// Load environment variables from .env.local
+require('dotenv').config({ path: '.env.local' });
+
+// Import Firebase Admin SDK directly for testing
+const admin = require('firebase-admin');
+
+// Initialize Firebase Admin for testing
+let adminAuth = null;
+let adminDb = null;
+
+try {
+  // Check if Firebase is already initialized
+  if (admin.apps.length === 0) {
+    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+    
+    if (serviceAccountJson) {
+      const serviceAccount = JSON.parse(serviceAccountJson);
+      
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        projectId: serviceAccount.project_id,
+        storageBucket: `${serviceAccount.project_id}.appspot.com`
+      });
+      
+      adminAuth = admin.auth();
+      adminDb = admin.firestore();
+      
+      console.log('✅ Firebase Admin initialized for testing');
+    } else {
+      console.log('⚠️ FIREBASE_SERVICE_ACCOUNT_JSON not found in environment');
+    }
+  } else {
+    adminAuth = admin.auth();
+    adminDb = admin.firestore();
+    console.log('✅ Using existing Firebase Admin instance');
+  }
+} catch (error) {
+  console.error('❌ Error initializing Firebase Admin:', error.message);
+}
 
 console.log('\n🔐 WordWise AI Authentication Flow Testing\n');
 console.log('=' .repeat(50));

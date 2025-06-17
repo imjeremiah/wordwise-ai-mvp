@@ -212,7 +212,10 @@ export const logger = {
     action: "login" | "logout" | "signup" | "password_reset",
     uid: string,
     metadata?: Record<string, any>
-  ) => globalLogger.setUser(uid) || globalLogger.logAuth(action, metadata),
+  ) => {
+    globalLogger.setUser(uid)
+    return globalLogger.logAuth(action, metadata)
+  },
 
   // Quick document logging
   document: (
@@ -220,24 +223,30 @@ export const logger = {
     uid: string,
     documentId?: string,
     metadata?: Record<string, any>
-  ) =>
-    globalLogger.setUser(uid) ||
-    globalLogger.logDocument(action, documentId, metadata),
+  ) => {
+    globalLogger.setUser(uid)
+    return globalLogger.logDocument(action, documentId, metadata)
+  },
 
   // Quick suggestion logging
   suggestion: (
     action: "request" | "accept" | "dismiss",
     uid: string,
     metadata?: Record<string, any>
-  ) =>
-    globalLogger.setUser(uid) || globalLogger.logSuggestion(action, metadata),
+  ) => {
+    globalLogger.setUser(uid)
+    return globalLogger.logSuggestion(action, metadata)
+  },
 
   // Quick error logging
   error: (
     error: string | Error,
     uid?: string,
     metadata?: Record<string, any>
-  ) => globalLogger.setUser(uid) || globalLogger.logError(error, metadata),
+  ) => {
+    globalLogger.setUser(uid)
+    return globalLogger.logError(error, metadata)
+  },
 
   // Quick performance logging
   performance: (
@@ -245,9 +254,10 @@ export const logger = {
     duration: number,
     uid?: string,
     metadata?: Record<string, any>
-  ) =>
-    globalLogger.setUser(uid) ||
-    globalLogger.logPerformance(operation, duration, metadata)
+  ) => {
+    globalLogger.setUser(uid)
+    return globalLogger.logPerformance(operation, duration, metadata)
+  }
 }
 
 // Export performance measurement utilities
