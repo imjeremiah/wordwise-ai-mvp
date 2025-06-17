@@ -9,6 +9,9 @@
     "dev:no-kill": "next dev -p 3005",
     "build": "next build",
     "build:export": "echo 'Static export temporarily disabled due to dynamic auth routes' && npm run build",
+    "build:firebase": "npm run build && npm run export:firebase",
+    "export:firebase": "next export && npm run copy:firebase",
+    "copy:firebase": "cp -r out/* .next/out/ 2>/dev/null || mkdir -p .next/out && cp -r out/* .next/out/",
     "start": "next start -p 3005",
     "lint": "next lint",
     "clean": "npm run lint:fix && npm run format:write",
@@ -26,6 +29,12 @@
     "setup:env": "node scripts/setup-env.js",
     "emulators": "firebase emulators:start --only auth,firestore,functions",
     "emulators:ui": "firebase emulators:start --only auth,firestore,functions --inspect-functions",
+    "deploy": "npm run build && firebase deploy",
+    "deploy:hosting": "npm run build && firebase deploy --only hosting",
+    "deploy:functions": "firebase deploy --only functions",
+    "deploy:firestore": "firebase deploy --only firestore",
+    "deploy:analyze": "node scripts/deploy.js",
+    "deploy:vercel-env": "node scripts/setup-vercel-env.js",
     "prepare": "husky install"
   },
   "dependencies": {
