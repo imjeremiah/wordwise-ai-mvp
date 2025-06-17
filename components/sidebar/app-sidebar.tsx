@@ -15,7 +15,8 @@ import {
   LogOut,
   ChevronDown,
   User,
-  Home
+  Home,
+  FileText
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -83,6 +84,11 @@ export function AppSidebar({ profile }: AppSidebarProps) {
       title: "Dashboard",
       icon: LayoutDashboard,
       href: "/dashboard"
+    },
+    {
+      title: "Editor",
+      icon: FileText,
+      href: "/editor"
     },
     {
       title: "Account",
