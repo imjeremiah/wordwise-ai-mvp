@@ -71,28 +71,45 @@ export function DocumentsDashboard({ userId }: DocumentsDashboardProps) {
 
   // Load documents
   useEffect(() => {
-    loadDocuments()
+    // CRITICAL FIX: Prevent this effect from running on the initial render if the userId
+    // is not yet available. This solves the race condition where the server action was
+    // being called with an undefined payload before the prop was fully passed.
+    if (userId) {
+      loadDocuments()
+    }
   }, [userId])
 
   const loadDocuments = async () => {
     console.log("[DocumentsDashboard] Loading documents...")
+    console.log("[DocumentsDashboard] userId:", userId)
+    console.log("[DocumentsDashboard] userId type:", typeof userId)
     setIsLoading(true)
     setError(null)
 
     try {
-      // Validate userId before making the call
-      if (!userId) {
-        console.error("[DocumentsDashboard] Missing userId")
-        setError("User authentication required")
+      // CRITICAL FIX: Add a strong guard to prevent calling the action with an invalid userId.
+      // This prevents the "payload must be an object" error at the framework level.
+      if (!userId || typeof userId !== "string" || userId.trim() === "") {
+        console.error(
+          "[DocumentsDashboard] Invalid or missing userId. Aborting fetch.",
+          { userId }
+        )
+        setError("User session is invalid. Please refresh the page.")
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "User authentication required"
+          title: "Authentication Error",
+          description:
+            "Your session is invalid. Please refresh the page or sign in again."
         })
+        setIsLoading(false)
         return
       }
 
-      const result = await getUserDocumentsAction(userId)
+      console.log(
+        "[DocumentsDashboard] Calling getUserDocumentsAction with userId:",
+        userId
+      )
+      const result = await getUserDocumentsAction({ ownerUID: userId })
 
       if (result.isSuccess && result.data) {
         console.log(
@@ -108,22 +125,47 @@ export function DocumentsDashboard({ userId }: DocumentsDashboardProps) {
           result.message
         )
         setError(result.message || "Failed to load documents")
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: result.message || "Failed to load documents"
-        })
+
+        // Check if this is an authentication error
+        if (
+          result.message?.includes("User ID") ||
+          result.message?.includes("authentication")
+        ) {
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description:
+              "Please sign out and sign back in to refresh your session"
+          })
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: result.message || "Failed to load documents"
+          })
+        }
       }
     } catch (error) {
       console.error("[DocumentsDashboard] Error loading documents:", error)
       const errorMessage =
         error instanceof Error ? error.message : "Failed to load documents"
       setError(errorMessage)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: errorMessage
-      })
+
+      // Check if this is related to the payload error
+      if (errorMessage.includes("payload") || errorMessage.includes("object")) {
+        toast({
+          variant: "destructive",
+          title: "Session Error",
+          description:
+            "There was an issue with your session. Please refresh the page or sign in again."
+        })
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: errorMessage
+        })
+      }
     } finally {
       setIsLoading(false)
     }

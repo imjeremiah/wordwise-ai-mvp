@@ -20,7 +20,7 @@ export default async function EditorPage() {
   console.log("[EditorPage] Loading editor for user:", session.userId)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50/30">
+    <div className="min-h-screen bg-white">
       <Suspense fallback={<EditorSkeleton />}>
         <EditorContent userId={session.userId!} />
       </Suspense>
@@ -32,10 +32,10 @@ function EditorSkeleton() {
   console.log("[EditorSkeleton] Rendering editor skeleton")
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50/30">
+    <div className="min-h-screen bg-white">
       {/* Header skeleton */}
-      <div className="border-b border-purple-100/50 bg-white/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-6xl p-4">
+      <div className="border-b border-gray-200 bg-white">
+        <div className="mx-auto max-w-5xl px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Skeleton className="size-8 rounded-full" />
@@ -50,30 +50,34 @@ function EditorSkeleton() {
       </div>
 
       {/* Main content skeleton */}
-      <div className="mx-auto max-w-6xl px-4 py-8">
+      <div className="mx-auto max-w-5xl px-6 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
           {/* Editor skeleton */}
           <div className="lg:col-span-3">
-            <div className="rounded-xl border border-purple-100/50 bg-white/80 p-8 shadow-sm backdrop-blur-sm">
-              <Skeleton className="mb-4 h-8 w-3/4" />
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
-                <Skeleton className="h-4 w-4/5" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
+            <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+              <div className="p-8">
+                <Skeleton className="mb-4 h-8 w-3/4" />
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-4/5" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
               </div>
             </div>
           </div>
 
           {/* Sidebar skeleton */}
           <div className="lg:col-span-1">
-            <div className="rounded-xl border border-purple-100/50 bg-white/80 p-6 shadow-sm backdrop-blur-sm">
-              <Skeleton className="mb-4 h-6 w-3/4" />
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-2/3" />
-                <Skeleton className="h-4 w-3/4" />
+            <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+              <div className="p-6">
+                <Skeleton className="mb-4 h-6 w-3/4" />
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
               </div>
             </div>
           </div>

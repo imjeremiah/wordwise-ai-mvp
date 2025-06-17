@@ -34,13 +34,20 @@ export async function createProfileAction(
       return { isSuccess: false, message: "Database connection failed - Please check Firebase configuration" }
     }
 
+    // FIX: Manually construct the profileData object to ensure it's a plain object.
+    // This prevents silent failures when the incoming 'data' object is not a plain object,
+    // which was causing empty documents to be created in Firestore.
     const profileData = {
-      ...data,
+      userId: data.userId,
+      email: data.email,
+      displayName: data.displayName,
+      photoURL: data.photoURL,
+      membership: data.membership,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp()
     }
     
-    console.log("[createProfileAction] Creating profile in Firestore")
+    console.log("[createProfileAction] Creating profile in Firestore with data:", profileData)
     const docRef = await db.collection(collections.profiles).add(profileData)
     const newProfile = await docRef.get()
     
@@ -73,14 +80,16 @@ export async function createProfileAction(
 }
 
 export async function getProfileByUserIdAction(
-  userId: string | null
+  payload: { userId: string | null }
 ): Promise<ActionState<FirebaseProfile>> {
-  console.log("[getProfileByUserIdAction] Fetching profile for user:", userId)
+  console.log("[getProfileByUserIdAction] Fetching profile with payload:", payload)
   
   try {
+    const { userId } = payload
+
     // Validate input
     if (!userId) {
-      console.error("[getProfileByUserIdAction] Missing or null userId")
+      console.error("[getProfileByUserIdAction] Missing or null userId in payload")
       return { isSuccess: false, message: "User ID is required" }
     }
 

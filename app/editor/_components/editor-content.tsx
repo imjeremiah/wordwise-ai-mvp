@@ -44,6 +44,7 @@ export function EditorContent({ userId }: EditorContentProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   console.log("[EditorContent] Component mounted for user:", userId)
 
@@ -67,6 +68,7 @@ export function EditorContent({ userId }: EditorContentProps) {
           setTitle(result.data.title)
           setContent(result.data.content)
           setWordCount(result.data.wordCount)
+          setHasUnsavedChanges(false)
         } else {
           console.error(
             "[EditorContent] Failed to load document:",
@@ -108,6 +110,7 @@ export function EditorContent({ userId }: EditorContentProps) {
       )
       setDocument(result.data)
       setLastSaved(new Date())
+      setHasUnsavedChanges(false)
 
       // Update URL with document ID
       const newUrl = new URL(window.location.href)
@@ -126,60 +129,50 @@ export function EditorContent({ userId }: EditorContentProps) {
     }
   }
 
-  // Auto-save document
-  const saveDocument = useCallback(
-    async (forceUpdate = false) => {
-      if (!document?.id || isSaving) return
+  // Manual save document only
+  const saveDocument = useCallback(async () => {
+    if (!document?.id || isSaving) return
 
-      console.log("[EditorContent] Auto-saving document:", document.id)
-      setIsSaving(true)
+    console.log("[EditorContent] Saving document:", document.id)
+    setIsSaving(true)
 
-      try {
-        const result = await updateDocumentAction(document.id, {
-          title,
-          content,
-          wordCount
+    try {
+      const result = await updateDocumentAction(document.id, {
+        title,
+        content,
+        wordCount
+      })
+
+      if (result.isSuccess) {
+        console.log("[EditorContent] Document saved successfully")
+        setLastSaved(new Date())
+        setHasUnsavedChanges(false)
+        toast({
+          title: "Saved",
+          description: "Document saved successfully"
         })
-
-        if (result.isSuccess) {
-          console.log("[EditorContent] Document saved successfully")
-          setLastSaved(new Date())
-          if (forceUpdate) {
-            toast({
-              title: "Saved",
-              description: "Document saved successfully"
-            })
-          }
-        } else {
-          console.error(
-            "[EditorContent] Failed to save document:",
-            result.message
-          )
-          toast({
-            variant: "destructive",
-            title: "Save Error",
-            description: "Failed to save document"
-          })
-        }
-      } catch (error) {
-        console.error("[EditorContent] Save error:", error)
-      } finally {
-        setIsSaving(false)
+      } else {
+        console.error(
+          "[EditorContent] Failed to save document:",
+          result.message
+        )
+        toast({
+          variant: "destructive",
+          title: "Save Error",
+          description: "Failed to save document"
+        })
       }
-    },
-    [document?.id, title, content, wordCount, isSaving, toast]
-  )
-
-  // Auto-save effect with debounce
-  useEffect(() => {
-    if (!document?.id) return
-
-    const timer = setTimeout(() => {
-      saveDocument()
-    }, 1000) // Save after 1 second of inactivity
-
-    return () => clearTimeout(timer)
-  }, [title, content, saveDocument, document?.id])
+    } catch (error) {
+      console.error("[EditorContent] Save error:", error)
+      toast({
+        variant: "destructive",
+        title: "Save Error",
+        description: "An unexpected error occurred while saving"
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }, [document?.id, title, content, wordCount, isSaving, toast])
 
   // Handle content change from Lexical editor
   const handleContentChange = useCallback(
@@ -187,6 +180,7 @@ export function EditorContent({ userId }: EditorContentProps) {
       console.log("[EditorContent] Content changed, word count:", newWordCount)
       setContent(newContent)
       setWordCount(newWordCount)
+      setHasUnsavedChanges(true)
     },
     []
   )
@@ -195,12 +189,13 @@ export function EditorContent({ userId }: EditorContentProps) {
   const handleTitleChange = (newTitle: string) => {
     console.log("[EditorContent] Title changed:", newTitle)
     setTitle(newTitle)
+    setHasUnsavedChanges(true)
   }
 
   // Manual save
   const handleManualSave = () => {
     console.log("[EditorContent] Manual save triggered")
-    saveDocument(true)
+    saveDocument()
   }
 
   // Back to dashboard
@@ -210,77 +205,82 @@ export function EditorContent({ userId }: EditorContentProps) {
   }
 
   if (isLoading) {
-    return <div>Loading editor...</div>
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="text-center">
+          <div className="mb-4 size-8 animate-spin rounded-full border-2 border-gray-300 border-t-green-600"></div>
+          <p className="text-gray-600">Loading your document...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50/30">
-      {/* Header */}
-      <div className="border-b border-purple-100/50 bg-white/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-6xl p-4">
+    <div className="min-h-screen bg-white">
+      {/* Header - Grammarly Style */}
+      <div className="sticky top-0 z-50 border-b border-gray-200 bg-white">
+        <div className="mx-auto max-w-5xl px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleBackToDashboard}
-                className="flex items-center gap-2 hover:bg-purple-50"
+                className="flex items-center gap-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 aria-label="Back to dashboard"
               >
                 <ArrowLeft className="size-4" />
                 <span className="hidden sm:inline">Dashboard</span>
               </Button>
 
-              <div className="flex items-center gap-2">
-                <FileText className="size-5 text-purple-600" />
+              <div className="flex items-center gap-3">
+                <FileText className="size-5 text-green-600" />
                 <Input
                   value={title}
                   onChange={e => handleTitleChange(e.target.value)}
-                  className="border-none bg-transparent text-lg font-semibold focus:border-purple-300 focus:ring-0"
-                  placeholder="Document title..."
+                  className="border-none bg-transparent text-xl font-medium text-gray-900 placeholder:text-gray-400 focus:ring-0 focus-visible:ring-0"
+                  placeholder="Untitled Document"
                   aria-label="Document title"
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              {lastSaved && (
+            <div className="flex items-center gap-3">
+              {hasUnsavedChanges && (
+                <span className="text-sm font-medium text-amber-600">
+                  Unsaved changes
+                </span>
+              )}
+
+              {lastSaved && !hasUnsavedChanges && (
                 <span className="text-sm text-gray-500">
                   Saved {lastSaved.toLocaleTimeString()}
                 </span>
               )}
 
               <Button
-                variant={isSaving ? "ghost" : "purple"}
-                size="sm"
                 onClick={handleManualSave}
-                disabled={isSaving}
-                className="flex items-center gap-2"
+                disabled={isSaving || !hasUnsavedChanges}
+                className="bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-300 disabled:text-gray-500"
+                size="sm"
                 aria-label="Save document"
               >
-                <Save className={`size-4 ${isSaving ? "animate-spin" : ""}`} />
+                <Save
+                  className={`mr-2 size-4 ${isSaving ? "animate-spin" : ""}`}
+                />
                 {isSaving ? "Saving..." : "Save"}
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hover:bg-purple-50"
-                aria-label="Document settings"
-              >
-                <MoreVertical className="size-4" />
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="mx-auto max-w-6xl px-4 py-8">
+      {/* Main Content - Grammarly Style */}
+      <div className="mx-auto max-w-5xl px-6 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-          {/* Editor Area */}
+          {/* Editor Area - Clean Grammarly Style */}
           <div className="lg:col-span-3">
-            <div className="rounded-xl border border-purple-100/50 bg-white/80 shadow-sm backdrop-blur-sm">
+            <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
               <LexicalEditor
                 initialContent={content}
                 onContentChange={handleContentChange}
@@ -289,22 +289,93 @@ export function EditorContent({ userId }: EditorContentProps) {
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar - Grammarly Style */}
           <div className="space-y-6 lg:col-span-1">
             {/* Document Stats */}
-            <DocumentStats
-              wordCount={wordCount}
-              readabilityScore={document?.readabilityScore}
-            />
+            <Card className="border-gray-200 bg-white shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                  <FileText className="size-4 text-green-600" />
+                  Document Stats
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Words</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {wordCount}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Characters</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {content.length}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Reading time</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {Math.ceil(wordCount / 200)} min
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Writing Suggestions Panel */}
-            <SuggestionPanel content={content} userId={userId} />
+            {/* Writing Goals */}
+            <Card className="border-gray-200 bg-white shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                  <Target className="size-4 text-green-600" />
+                  Writing Goals
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Daily Goal</span>
+                    <span className="font-medium text-gray-900">
+                      {wordCount}/500
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-gray-200">
+                    <div
+                      className="h-2 rounded-full bg-green-600 transition-all duration-300"
+                      style={{
+                        width: `${Math.min((wordCount / 500) * 100, 100)}%`
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Writing Suggestions */}
+            <Card className="border-gray-200 bg-white shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                  <Zap className="size-4 text-green-600" />
+                  Writing Suggestions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="py-8 text-center">
+                  <div className="mb-3">
+                    <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-gray-100">
+                      <BookOpen className="size-6 text-gray-400" />
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    Start writing to see suggestions
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Quick Actions */}
-            <Card className="border-purple-100/50 bg-white/80 backdrop-blur-sm">
+            <Card className="border-gray-200 bg-white shadow-sm">
               <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                  <Zap className="size-4 text-purple-600" />
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                  <Settings className="size-4 text-green-600" />
                   Quick Actions
                 </CardTitle>
               </CardHeader>
@@ -312,7 +383,7 @@ export function EditorContent({ userId }: EditorContentProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start hover:bg-purple-50"
+                  className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   aria-label="Check grammar"
                 >
                   <BookOpen className="mr-2 size-4" />
@@ -321,20 +392,11 @@ export function EditorContent({ userId }: EditorContentProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start hover:bg-purple-50"
+                  className="w-full justify-start text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   aria-label="Improve style"
                 >
                   <Target className="mr-2 size-4" />
                   Improve Style
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start hover:bg-purple-50"
-                  aria-label="Editor settings"
-                >
-                  <Settings className="mr-2 size-4" />
-                  Settings
                 </Button>
               </CardContent>
             </Card>

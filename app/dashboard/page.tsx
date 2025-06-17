@@ -37,13 +37,17 @@ async function DashboardContent() {
   console.log("[Dashboard Page] Checking authentication")
   const { userId } = await auth()
 
-  if (!userId) {
+  console.log("[Dashboard Page] Auth result - userId:", userId)
+  console.log("[Dashboard Page] Auth result - userId type:", typeof userId)
+
+  if (!userId || userId === null || userId === undefined) {
     console.log("[Dashboard Page] No user found, redirecting to login")
+    console.log("[Dashboard Page] userId value:", userId)
     redirect("/login")
   }
 
   console.log("[Dashboard Page] Fetching profile for user:", userId)
-  let profileResult = await getProfileByUserIdAction(userId)
+  let profileResult = await getProfileByUserIdAction({ userId })
 
   // Check if Firestore is not enabled
   if (
@@ -180,7 +184,20 @@ async function DashboardContent() {
       </div>
 
       {/* Documents Dashboard */}
-      <DocumentsDashboard userId={userId} />
+      {userId ? (
+        <DocumentsDashboard userId={userId} />
+      ) : (
+        <div className="flex items-center justify-center rounded-lg border border-red-200 bg-red-50 p-8">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-red-800">
+              Authentication Error
+            </h3>
+            <p className="text-red-600">
+              Unable to load user session. Please refresh the page.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

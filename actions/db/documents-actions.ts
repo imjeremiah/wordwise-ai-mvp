@@ -28,13 +28,15 @@ export async function createDocumentAction(
     const wordCount = data.content.trim().split(/\s+/).filter(word => word.length > 0).length
 
     const documentData = {
-      ...data,
-      wordCount,
+      ownerUID: data.ownerUID,
+      title: data.title,
+      content: data.content,
+      wordCount: wordCount,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp()
     }
     
-    console.log("[createDocumentAction] Creating document in Firestore with word count:", wordCount)
+    console.log("[createDocumentAction] Creating document in Firestore with data:", documentData)
     const docRef = await db.collection(collections.documents).add(documentData)
     const newDocument = await docRef.get()
     
@@ -103,17 +105,20 @@ export async function getDocumentAction(
   }
 }
 
-// Read all documents for a user
+// Read all documents for a user. This is the single, definitive action.
 export async function getUserDocumentsAction(
-  ownerUID: string | null
+  payload: { ownerUID: string }
 ): Promise<ActionState<FirebaseDocument[]>> {
-  console.log("[getUserDocumentsAction] Fetching documents for user:", ownerUID)
+  console.log("[getUserDocumentsAction] Fetching documents with payload:", payload)
   
   try {
-    // Validate input - this fixes the "null payload" error
-    if (!ownerUID) {
-      console.error("[getUserDocumentsAction] Missing or null ownerUID")
-      return { isSuccess: false, message: "User ID is required" }
+    const { ownerUID } = payload
+
+    // This check is now a secondary safeguard. The primary check is on the client.
+    if (!ownerUID || typeof ownerUID !== 'string') {
+      const errorMessage = "User ID is invalid or missing in payload."
+      console.error(`[getUserDocumentsAction] ${errorMessage}`, { payload })
+      return { isSuccess: false, message: errorMessage }
     }
 
     if (!db) {
