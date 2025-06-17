@@ -2,8 +2,6 @@ import { initializeApp, getApps, cert } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
 import { getFirestore } from "firebase-admin/firestore"
 import { getStorage } from "firebase-admin/storage"
-import * as fs from "fs"
-import * as path from "path"
 
 // Initialize Firebase Admin SDK for server-side operations
 console.log("[Firebase Config] Initializing Firebase Admin SDK...")
@@ -16,83 +14,76 @@ if (!getApps().length) {
   console.log("[Firebase Config] No existing apps found, creating new app...")
 
   try {
-    // Check if we have the service account file
-    const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH
+    // Check if we have the service account JSON in environment variables
+    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON
 
-    console.log("[Firebase Config] Environment check:")
-    console.log("[Firebase Config] - NODE_ENV:", process.env.NODE_ENV)
-    console.log(
-      "[Firebase Config] - FIREBASE_SERVICE_ACCOUNT_PATH:",
-      serviceAccountPath
-    )
-    console.log("[Firebase Config] - Current working directory:", process.cwd())
-
-    if (!serviceAccountPath) {
+    if (serviceAccountJson) {
       console.log(
-        "[Firebase Config] No FIREBASE_SERVICE_ACCOUNT_PATH provided, skipping Firebase Admin initialization"
+        "[Firebase Config] Found FIREBASE_SERVICE_ACCOUNT_JSON, parsing..."
       )
+
+      // Parse the JSON string to object
+      const serviceAccount = JSON.parse(serviceAccountJson)
+
+      // Log the project ID for verification (without exposing sensitive data)
       console.log(
-        "[Firebase Config] Firebase Admin features will not be available"
+        "[Firebase Config] Service account project ID:",
+        serviceAccount.project_id
+      )
+
+      // Initialize Firebase Admin with service account
+      const app = initializeApp({
+        credential: cert(serviceAccount),
+        projectId: serviceAccount.project_id,
+        storageBucket: `${serviceAccount.project_id}.appspot.com`
+      })
+
+      adminAuth = getAuth(app)
+      adminDb = getFirestore(app)
+      adminStorage = getStorage(app)
+
+      console.log(
+        "[Firebase Config] Firebase Admin SDK initialized successfully"
+      )
+      console.log(`[Firebase Config] Project ID: ${serviceAccount.project_id}`)
+      console.log(
+        `[Firebase Config] Storage Bucket: ${serviceAccount.project_id}.appspot.com`
       )
     } else {
-      console.log(
-        "[Firebase Config] Loading service account from:",
-        serviceAccountPath
+      console.warn(
+        "[Firebase Config] No FIREBASE_SERVICE_ACCOUNT_JSON provided, skipping Firebase Admin initialization"
       )
-
-      try {
-        // Use absolute path for the service account file
-        const absolutePath = path.resolve(process.cwd(), serviceAccountPath)
-        console.log("[Firebase Config] Absolute path:", absolutePath)
-
-        const serviceAccountContent = fs.readFileSync(absolutePath, "utf8")
-        const serviceAccount = JSON.parse(serviceAccountContent)
-        console.log("[Firebase Config] Service account loaded successfully")
-
-        initializeApp({
-          credential: cert(serviceAccount),
-          projectId: serviceAccount.project_id || "aivideoeduedu"
-        })
-
-        console.log("[Firebase Config] Firebase Admin initialized successfully")
-        console.log(
-          "[Firebase Config] Project ID:",
-          serviceAccount.project_id || "aivideoeduedu"
-        )
-
-        // Initialize services after successful app initialization
-        adminAuth = getAuth()
-        adminDb = getFirestore()
-        adminStorage = getStorage()
-
-        console.log("[Firebase Config] All Firebase Admin services initialized")
-      } catch (fileError) {
-        console.error(
-          "[Firebase Config] Error loading service account file:",
-          fileError
-        )
-        console.log(
-          "[Firebase Config] Continuing without Firebase Admin functionality"
-        )
-      }
+      console.warn(
+        "[Firebase Config] Admin SDK features (server actions, auth) will not work without service account"
+      )
     }
   } catch (error) {
-    console.error("[Firebase Config] Error initializing Firebase Admin:", error)
-    console.log(
-      "[Firebase Config] Continuing without Firebase Admin functionality"
+    console.error(
+      "[Firebase Config] Error initializing Firebase Admin SDK:",
+      error
+    )
+    console.error(
+      "[Firebase Config] Make sure FIREBASE_SERVICE_ACCOUNT_JSON is valid JSON"
     )
   }
 } else {
-  console.log("[Firebase Config] Using existing Firebase app")
-  // Get existing services
+  console.log(
+    "[Firebase Config] Firebase app already exists, getting existing instances..."
+  )
+  const existingApp = getApps()[0]
+
   try {
-    adminAuth = getAuth()
-    adminDb = getFirestore()
-    adminStorage = getStorage()
+    adminAuth = getAuth(existingApp)
+    adminDb = getFirestore(existingApp)
+    adminStorage = getStorage(existingApp)
+    console.log("[Firebase Config] Retrieved existing Firebase Admin instances")
   } catch (error) {
-    console.error("[Firebase Config] Error getting Firebase services:", error)
+    console.error(
+      "[Firebase Config] Error getting existing Firebase instances:",
+      error
+    )
   }
 }
 
-// Export the Firebase Admin services (may be null if initialization failed)
+// Export the instances (may be null if Firebase is not configured)
 export { adminAuth, adminDb, adminStorage }
